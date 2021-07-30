@@ -14,12 +14,15 @@ if(NOT_SUBPROJECT)
     include(CTest)
 endif()
 
+include_directories("${PROJECT_SOURCE_DIR}/src")
+
 # Dependencies
 find_package(spdlog REQUIRED)
 
 # Build
 add_subdirectory(src)
 add_executable(shepichess "src/main.cpp")
+add_dependencies(shepichess engine)
 target_link_libraries(shepichess PRIVATE engine)
 
 # Test
