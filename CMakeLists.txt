@@ -14,6 +14,9 @@ if(NOT_SUBPROJECT)
     include(CTest)
 endif()
 
+# Dependencies
+find_package(spdlog REQUIRED)
+
 # Build
 add_subdirectory(src)
 add_executable(shepichess)
