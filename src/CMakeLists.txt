@@ -1,6 +1,6 @@
 add_library(engine)
 
-set(SourceFiles main.cpp)
+set(SourceFiles bitboard.cpp)
 set(HeaderFiles bitboard.h)
 
 target_sources( 

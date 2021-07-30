@@ -19,7 +19,7 @@ find_package(spdlog REQUIRED)
 
 # Build
 add_subdirectory(src)
-add_executable(shepichess)
+add_executable(shepichess "src/main.cpp")
 target_link_libraries(shepichess PRIVATE engine)
 
 # Test
