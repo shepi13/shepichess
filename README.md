@@ -1,0 +1,1 @@
+A simple c++ chess engine. Currently in development.
