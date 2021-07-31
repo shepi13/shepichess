@@ -9,6 +9,9 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Install git
+          command: 'git submodule update --init --recursive'
+      - run:
           name: Install GCC
           command: 'sudo apt-get update && sudo apt-get install -y gcc g++'
       - run:
