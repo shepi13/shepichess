@@ -9,14 +9,11 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Install sudo
-          command: 'apt-get update && apt-get install -y sudo'
-      - run:
           name: Install GCC
-          command: 'apt-get update && apt-get install -y gcc g++'
+          command: 'sudo apt-get update && sudo apt-get install -y gcc g++'
       - run:
           name: Install CMAKE
-          command: 'apt-get update && sudo apt-get install -y cmake'
+          command: 'sudo apt-get update && sudo apt-get install -y cmake'
       - run:
           name: Configure with CMAKE
           command: 'cmake -H. -Bbuild'
