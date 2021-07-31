@@ -11,7 +11,13 @@ target_sources(
         ${HeaderFiles}
 )
 target_compile_features(engine PRIVATE cxx_std_17)
-target_link_libraries(engine PRIVATE spdlog)
+
+# spdlog
+add_dependencies(engine spdlog)
+target_include_directories(engine PUBLIC ${PROJECT_SOURCE_DIR}/bin/spdlog/include)
+target_link_directories(engine PRIVATE ${PROJECT_SOURCE_DIR}/bin/spdlog/lib)
+
+# source group
 source_group(
     TREE "${PROJECT_SOURCE_DIR}"
     PREFIX "Headers"
