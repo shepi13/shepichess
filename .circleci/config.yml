@@ -9,7 +9,7 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Install git
+          name: Install git submodules
           command: 'git submodule update --init --recursive'
       - run:
           name: Install GCC
@@ -25,4 +25,4 @@ jobs:
           command: 'cd build && make -j8'
       - run:
           name: Test
-          command: 'ctest'
+          command: 'cd build && ctest'
