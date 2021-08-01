@@ -7,22 +7,37 @@ jobs:
       - image: cimg/base:2021.04
 
     steps:
+    # Initial Git checkout with submodules
       - checkout
       - run:
           name: Install git submodules
           command: 'git submodule update --init --recursive'
+    # Restore Cache for 3rd party libs
+      - run:
+          name: Spdlog checksum
+          command: >-
+            SPDLOG_HASH=$(git ls-tree HEAD third_party/spdlog | awk {'print $3'})
+      - restore_cache:
+          key: spdlogcache-v1-{{ .Environment.SPDLOG_HASH }}
+    # Install rquired tools
       - run:
           name: Install GCC
           command: 'sudo apt-get update && sudo apt-get install -y gcc g++'
       - run:
           name: Install CMAKE
           command: 'sudo apt-get update && sudo apt-get install -y cmake'
+    # Build
       - run:
           name: Configure with CMAKE
           command: 'cmake -H. -Bbuild'
       - run:
           name: Build
           command: 'cd build && make -j8'
+    # Save Cache
+      - save_cache:
+          key: spdlogcache-v1-{{ .Environment.SPDLOG_HASH }}
+          paths: bin/spdlog
+    # Test
       - run:
           name: Test
           command: 'cd build && ctest'
