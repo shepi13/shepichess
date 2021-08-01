@@ -17,6 +17,7 @@ jobs:
           name: Spdlog checksum
           command: >-
             SPDLOG_HASH=$(git ls-tree HEAD third_party/spdlog | awk {'print $3'})
+            echo $SPDLOG_HASH
       - restore_cache:
           key: spdlogcache-v1-{{ .Environment.SPDLOG_HASH }}
     # Install rquired tools
@@ -36,7 +37,8 @@ jobs:
     # Save Cache
       - save_cache:
           key: spdlogcache-v1-{{ .Environment.SPDLOG_HASH }}
-          paths: bin/spdlog
+          paths: 
+            - bin/spdlog
     # Test
       - run:
           name: Test
