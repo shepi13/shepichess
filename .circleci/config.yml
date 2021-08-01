@@ -16,10 +16,9 @@ jobs:
       - run:
           name: Spdlog checksum
           command: >-
-            SPDLOG_HASH=$(git ls-tree HEAD third_party/spdlog | awk {'print $3'})
-            echo $SPDLOG_HASH
+            SPDLOG_HASH=$(git ls-tree HEAD third_party/spdlog | awk {'print $3'}) && echo $SPDLOG_HASH
       - restore_cache:
-          key: spdlogcache-v1-{{ .Environment.SPDLOG_HASH }}
+          key: spdlogcache-v1-{{ .Environment.$SPDLOG_HASH }}
     # Install rquired tools
       - run:
           name: Install GCC
@@ -36,7 +35,7 @@ jobs:
           command: 'cd build && make -j8'
     # Save Cache
       - save_cache:
-          key: spdlogcache-v1-{{ .Environment.SPDLOG_HASH }}
+          key: spdlogcache-v1-{{ .Environment.$SPDLOG_HASH }}
           paths: 
             - bin/spdlog
     # Test
