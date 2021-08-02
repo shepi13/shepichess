@@ -2,6 +2,7 @@
 version: 2.1
 
 # TODO: Add nightly builds to test windows/clang for arch specific functions
+# TODO: Add store_test_results step
 
 jobs:
   build:
@@ -43,4 +44,4 @@ jobs:
     # Test
       - run:
           name: Test
-          command: 'cd build && ctest'
+          command: 'cd build && tests/engineTests'
