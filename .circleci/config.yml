@@ -1,7 +1,8 @@
 # Use the latest 2.1 version of CircleCI pipeline process engine. See: https://circleci.com/docs/2.0/configuration-reference
 version: 2.1
 
-# TODO: Add architecture specific nightly tests
+# TODO: Add nightly builds to test windows/clang for arch specific functions
+# TODO: Add store_test_results step
 
 jobs:
   build:
@@ -61,4 +62,8 @@ jobs:
     # Test
       - run:
           name: Test
+<<<<<<< HEAD
           command: 'cd build && tests/engineTests'
+=======
+          command: 'cd build && tests/engineTests'
+>>>>>>> (bitboards) Add tests for implemented functions, use catch instead of ctest as it seems cleaner for now.
