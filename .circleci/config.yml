@@ -22,14 +22,14 @@ jobs:
           command: >-
             echo $(git ls-tree HEAD third_party/spdlog | awk {'print $3'}) >.spdlog_hash
       - restore_cache:
-          key: spdlogcache-v1-{{ checksum ".spdlog_hash" }}
+          key: spdlogcache-v2-{{ checksum ".spdlog_hash" }}
       # Catch2
       - run:
           name: Catch2 checksum
           command: >-
             echo $(git ls-tree HEAD third_party/Catch2 | awk {'print $3'}) >.catch2_hash
       - restore_cache:
-          key: catch2cache-v2-{{ checksum ".catch2_hash" }} 
+          key: catch2cache-v3-{{ checksum ".catch2_hash" }} 
         
     # Install required tools
       - run:
