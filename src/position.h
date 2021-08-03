@@ -1,9 +1,9 @@
-#include "bitboard.h"
+#pragma once
 
 namespace shepichess {
 
-  void bitboards::init() {
+class Position {
 
-  }
+};
 
 } // namespace shepichess
