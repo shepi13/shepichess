@@ -1,5 +1,6 @@
-#include <iostream>
+#include "uci_application.h"
 
 int main() {
-  std::cout << "Hello World!\n";
+  shepichess::UCIApp app;
+  app.mainLoop();
 }
