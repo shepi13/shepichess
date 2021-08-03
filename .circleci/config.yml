@@ -47,14 +47,16 @@ jobs:
     # Save Cache
       # spdlog
       - save_cache:
-          key: spdlogcache-v1-{{ checksum ".spdlog_hash" }}
+          key: spdlogcache-v2-{{ checksum ".spdlog_hash" }}
           paths: 
             - bin/spdlog
+            - build/spdlog
       # Catch2
       - save_cache:
-          key: catch2cache-v2-{{ checksum ".catch2_hash" }}
+          key: catch2cache-v3-{{ checksum ".catch2_hash" }}
           paths:
             - bin/Catch2
+            - build/Catch2
 
     # Test
       - run:
