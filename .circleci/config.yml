@@ -62,4 +62,6 @@ jobs:
     # Test
       - run:
           name: Test
-          command: 'cd build && tests/engineTests'
+          command: 'cd build && tests/engineTests -r junit >testresults.xml'
+      - store_test_results:
+          path: 'build/testresults.xml'
