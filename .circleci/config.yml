@@ -29,7 +29,7 @@ jobs:
           command: >-
             echo $(git ls-tree HEAD third_party/Catch2 | awk {'print $3'}) >.catch2_hash
       - restore_cache:
-          key: catch2cache-v1-{{ checksum ".catch2_hash" }} 
+          key: catch2cache-v2-{{ checksum ".catch2_hash" }} 
         
     # Install required tools
       - run:
@@ -52,9 +52,9 @@ jobs:
             - bin/spdlog
       # Catch2
       - save_cache:
-          key: catch2cache-v1-{{ checksum ".catch2_hash" }}
+          key: catch2cache-v2-{{ checksum ".catch2_hash" }}
           paths:
-            - build/third_party/Catch2
+            - bin/Catch2
 
     # Test
       - run:
