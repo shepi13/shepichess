@@ -59,4 +59,4 @@ jobs:
     # Test
       - run:
           name: Test
-          command: 'cd build && tests/engineTest'
+          command: 'cd build && tests/engineTests'
