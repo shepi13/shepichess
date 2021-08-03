@@ -1,6 +1,8 @@
 # Use the latest 2.1 version of CircleCI pipeline process engine. See: https://circleci.com/docs/2.0/configuration-reference
 version: 2.1
 
+# TODO: Add architecture specific nightly tests
+
 jobs:
   build:
     docker:
@@ -12,33 +14,49 @@ jobs:
       - run:
           name: Install git submodules
           command: 'git submodule update --init --recursive'
+
     # Restore Cache for 3rd party libs
+      # spdlog
       - run:
           name: Spdlog checksum
           command: >-
             echo $(git ls-tree HEAD third_party/spdlog | awk {'print $3'}) >.spdlog_hash
       - restore_cache:
           key: spdlogcache-v1-{{ checksum ".spdlog_hash" }}
-    # Install rquired tools
+      # Catch2
       - run:
-          name: Install GCC
-          command: 'sudo apt-get update && sudo apt-get install -y gcc g++'
+          name: Catch2 checksum
+          command: >-
+            echo $(git ls-tree HEAD third_party/Catch2 | awk {'print $3'}) >.catch2_hash
+      - restore_cache:
+          key: catch2cache-v1-{{ checksum ".catch2_hash" }} 
+        
+    # Install required tools
       - run:
           name: Install CMAKE
           command: 'sudo apt-get update && sudo apt-get install -y cmake'
+
     # Build
       - run:
           name: Configure with CMAKE
           command: 'cmake -H. -Bbuild'
       - run:
           name: Build
-          command: 'cd build && make -j8'
+          command: 'cd build && make -j$(nproc)'
+
     # Save Cache
+      # spdlog
       - save_cache:
           key: spdlogcache-v1-{{ checksum ".spdlog_hash" }}
           paths: 
             - bin/spdlog
+      # Catch2
+      - save_cache:
+          key: catch2cache-v1-{{ checksum ".catch2_hash" }}
+          paths:
+            - build/third_party/Catch2
+
     # Test
       - run:
           name: Test
-          command: 'cd build && ctest'
+          command: 'cd build && tests/engineTest'
