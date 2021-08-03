@@ -42,7 +42,7 @@ namespace bitboards {
 void init();
 std::string repr(Bitboard);
 
-constexpr Bitboard square(unsigned int);
+constexpr Bitboard fromSquare(unsigned int);
 constexpr bool getbit(Bitboard, unsigned int);
 constexpr Bitboard setbit(Bitboard, unsigned int);
 constexpr Bitboard clearbit(Bitboard, unsigned int);
@@ -56,24 +56,24 @@ template<Direction> constexpr Bitboard shift(Bitboard);
 
 // Implementations for template and inline functions
 
-constexpr Bitboard bitboards::square(unsigned int idx)
+constexpr Bitboard bitboards::fromSquare(unsigned int idx)
 {
   return 1ULL << idx;
 }
 
 constexpr bool bitboards::getbit(Bitboard board, unsigned int idx)
 {
-  return square(idx) & board; 
+  return fromSquare(idx) & board; 
 }
 
 constexpr Bitboard bitboards::setbit(Bitboard board, unsigned int idx)
 {
-  return square(idx) | board;
+  return fromSquare(idx) | board;
 }
 
 constexpr Bitboard bitboards::clearbit(Bitboard board, unsigned int idx) 
 {
-  return ~square(idx) & board;
+  return ~fromSquare(idx) & board;
 }
 
 constexpr Bitboard bitboards::poplsb(Bitboard board) 

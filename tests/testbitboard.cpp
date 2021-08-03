@@ -52,9 +52,10 @@ TEST_CASE("bitboards::popcount", "[bitboard]") {
   REQUIRE(popcount(0xffff'ffff'ffff'ffffULL) == 64);
 }
 
-// Test that shifting a square in the center works as expected
+// Test that shifting a fromSquare in the center works as expected
 TEST_CASE("bitboards::shift center", "[bitboard]") {
-  Bitboard e4 = square(27), d4 = square(28), e5 = square(35), d5 = square(36);
+  Bitboard e4 = fromSquare(27), d4 = fromSquare(28);
+  Bitboard e5 = fromSquare(35), d5 = fromSquare(36);
   REQUIRE(shift<Direction::East>(d4) == e4);
   REQUIRE(shift<Direction::West>(e4) == d4);
   REQUIRE(shift<Direction::North>(e4) == e5);
@@ -68,7 +69,8 @@ TEST_CASE("bitboards::shift center", "[bitboard]") {
 
 // Test that shifting doesn't wrap around across edges
 TEST_CASE("bitboards::shift edge", "[bitboard]") {
-  Bitboard a4 = square(31), h4 = square(24), e1 = square(3), e8=square(59);
+  Bitboard a4 = fromSquare(31), h4 = fromSquare(24);
+  Bitboard e1 = fromSquare(3), e8 = fromSquare(59);
   // East
   REQUIRE(shift<Direction::NorthEast>(h4) == 0);
   REQUIRE(shift<Direction::East>(h4) == 0);
