@@ -62,8 +62,4 @@ jobs:
     # Test
       - run:
           name: Test
-<<<<<<< HEAD
           command: 'cd build && tests/engineTests'
-=======
-          command: 'cd build && tests/engineTests'
->>>>>>> f6eb477e140cf30a52c26d2f27987ebdbb974c8d
