@@ -30,8 +30,6 @@ ExternalProject_Add(
     -DSPDLOG_BUILD_SHARED=OFF
     -DCMAKE_INSTALL_PREFIX=${PROJECT_SOURCE_DIR}/bin/spdlog
 )
-link_directories(${PROJECT_SOURCE_DIR}/bin/spdlog/lib)
-include_directories(${PROJECT_SOURCE_DIR}/bin/spdlog/include)
 
 # Build
 add_subdirectory(src)
@@ -52,8 +50,6 @@ if(BUILD_TESTING AND NOT_SUBPROJECT)
         -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}
         -DCMAKE_INSTALL_PREFIX=${PROJECT_SOURCE_DIR}/bin/Catch2
     )
-    link_directories(${PROJECT_SOURCE_DIR}/bin/Catch2/lib)
-    include_directories(${PROJECT_SOURCE_DIR}/bin/Catch2/include)
     list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/third_party/Catch2/extras)
     add_subdirectory(tests)
 endif()
