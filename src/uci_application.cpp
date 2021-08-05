@@ -8,7 +8,6 @@
 #include "bitboard.h"
 #include "logging.h"
 
-using std::string;
 
 namespace shepichess {
 
