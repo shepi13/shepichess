@@ -1,6 +1,6 @@
 add_executable(engineTests)
 
-set(SourceFiles testbitboard.cpp)
+set(SourceFiles testbitboard.cpp test_uci_application.cpp)
 
 target_sources(
     engineTests
