@@ -57,11 +57,11 @@ template<Direction> constexpr Bitboard shift(Bitboard);
 
 namespace attack_maps {
 
-Bitboard knightAttacks(unsigned int, Bitboard);
+Bitboard knightAttacks(unsigned int);
+Bitboard kingAttacks(unsigned int);
 Bitboard bishopAttacks(unsigned int, Bitboard);
 Bitboard rookAttacks(unsigned int, Bitboard);
 Bitboard queenAttacks(unsigned int, Bitboard);
-Bitboard kingAttacks(unsigned int, Bitboard);
 
 } // namespace shepichess::attack_maps
 

@@ -128,12 +128,30 @@ MagicData generateMagic(int square, bool rook)
 
 Bitboard generateKingAttacks(int square)
 {
-  return 0;
+  using bitboards::shift;
+  Bitboard squareBB = bitboards::fromSquare(square);
+  return shift<Direction::North>(squareBB) |
+         shift<Direction::NorthEast>(squareBB) |
+         shift<Direction::East>(squareBB) |
+         shift<Direction::SouthEast>(squareBB) |
+         shift<Direction::South>(squareBB) |
+         shift<Direction::SouthWest>(squareBB) |
+         shift<Direction::West>(squareBB) |
+         shift<Direction::NorthWest>(squareBB);
 }
 
 Bitboard generateKnightAttacks(int square)
 {
-  return 0;
+  using bitboards::shift;
+  Bitboard squareBB = bitboards::fromSquare(square);
+  return shift<Direction::NorthEast>(shift<Direction::North>(square)) |
+  shift<Direction::NorthEast>(shift<Direction::East>(square)) |
+  shift<Direction::SouthEast>(shift<Direction::East>(square)) |
+  shift<Direction::SouthEast>(shift<Direction::South>(square)) |
+  shift<Direction::SouthWest>(shift<Direction::South>(square)) |
+  shift<Direction::SouthWest>(shift<Direction::West>(square)) |
+  shift<Direction::NorthWest>(shift<Direction::West>(square)) |
+  shift<Direction::NorthWest>(shift<Direction::North>(square));
 }
 
 } // namespace
@@ -159,6 +177,35 @@ void bitboards::init()
   }
   initialized = true;
   SPDLOG_INFO("Bitboards successfully initialized");
+}
+
+Bitboard attack_maps::knightAttacks(unsigned int square)
+{
+  return knightAttackMap[square];
+}
+
+Bitboard attack_maps::kingAttacks(unsigned int square)
+{
+  return kingAttackMap[square];
+}
+
+Bitboard attack_maps::bishopAttacks(unsigned int square, Bitboard blockers)
+{
+  const MagicData& magic = bishopAttackMap[square];
+  int hash = ((magic.mask & blockers) * magic.constant) >> (64 - magic.shift);
+  return magic.attack_map[hash];
+}
+
+Bitboard attack_maps::rookAttacks(unsigned int square, Bitboard blockers)
+{
+  const MagicData& magic = rookAttackMap[square];
+  int hash = ((magic.mask & blockers) * magic.constant) >> (64 - magic.shift);
+  return magic.attack_map[hash];
+}
+
+Bitboard attack_maps::queenAttacks(unsigned int square, Bitboard blockers)
+{
+  return rookAttacks(square, blockers) | bishopAttacks(square, blockers);
 }
 
 } // namespace shepichess
