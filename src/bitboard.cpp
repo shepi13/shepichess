@@ -88,7 +88,8 @@ Bitboard generateRandomConstant(Bitboard mask)
 Bitboard generateBlockerPermutations(int index, Bitboard mask)
 {
   Bitboard result = 0ULL;
-  for(int i = 0; i < bitboards::popcount(mask); i++, mask=bitboards::poplsb(mask)) {
+  int bitcount = bitboards::popcount(mask);
+  for(int i = 0; i < bitcount; i++, mask=bitboards::poplsb(mask)) {
     int lsb = bitboards::bitscan(mask);
     if(index & (1 << i)) result |= bitboards::fromSquare(lsb);
   }
@@ -101,7 +102,7 @@ MagicData generateMagic(int square, bool rook)
   // Generate all blocker/attack combinations
   std::array<Bitboard, kAttackMapSize> attacks{0}, blockers{0};
   Bitboard mask = generateMask(square, rook);
-  SPDLOG_TRACE("Generated mask for ({}, {}):\n{}", square, rook, repr(mask));
+  SPDLOG_DEBUG("Generated mask for ({}, {}):\n{}", square, rook, repr(mask));
   int shift = bitboards::popcount(mask);
   for(int i = 0; i < (1 << shift); i++) {
     blockers[i] = generateBlockerPermutations(i, mask);
@@ -122,7 +123,10 @@ MagicData generateMagic(int square, bool rook)
         break;
       }
     }
-    if(success) return MagicData { shift, mask, constant, magic_attacks };
+    if(success) {
+      SPDLOG_DEBUG("Generated Magic Data with shift={}, constant={}", shift, constant);
+      return MagicData { shift, mask, constant, magic_attacks };
+    }
   }
 }
 
@@ -144,14 +148,14 @@ Bitboard generateKnightAttacks(int square)
 {
   using bitboards::shift;
   Bitboard squareBB = bitboards::fromSquare(square);
-  return shift<Direction::NorthEast>(shift<Direction::North>(square)) |
-  shift<Direction::NorthEast>(shift<Direction::East>(square)) |
-  shift<Direction::SouthEast>(shift<Direction::East>(square)) |
-  shift<Direction::SouthEast>(shift<Direction::South>(square)) |
-  shift<Direction::SouthWest>(shift<Direction::South>(square)) |
-  shift<Direction::SouthWest>(shift<Direction::West>(square)) |
-  shift<Direction::NorthWest>(shift<Direction::West>(square)) |
-  shift<Direction::NorthWest>(shift<Direction::North>(square));
+  return shift<Direction::NorthEast>(shift<Direction::North>(squareBB)) |
+  shift<Direction::NorthEast>(shift<Direction::East>(squareBB)) |
+  shift<Direction::SouthEast>(shift<Direction::East>(squareBB)) |
+  shift<Direction::SouthEast>(shift<Direction::South>(squareBB)) |
+  shift<Direction::SouthWest>(shift<Direction::South>(squareBB)) |
+  shift<Direction::SouthWest>(shift<Direction::West>(squareBB)) |
+  shift<Direction::NorthWest>(shift<Direction::West>(squareBB)) |
+  shift<Direction::NorthWest>(shift<Direction::North>(squareBB));
 }
 
 } // namespace
@@ -167,6 +171,7 @@ void bitboards::init()
   static bool initialized = false;
   if(initialized) return;
 
+  initLogging();
   SPDLOG_INFO("Initializing Bitboards");
   for(int square = 0; square < 64; square++) {
     SPDLOG_DEBUG("Initializing for square: {}", square);
