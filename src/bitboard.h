@@ -36,6 +36,8 @@ constexpr Bitboard kRank1 = 0xffULL;
 constexpr Bitboard kRank2 = kRank1 << 8;
 constexpr Bitboard kRank7 = kRank1 << 48;
 constexpr Bitboard kRank8 = kRank1 << 56;
+// Other useful constants
+constexpr Bitboard kBoardEdge = kFileA | kFileH | kRank1 | kRank8;
 
 namespace bitboards {
 
@@ -52,6 +54,16 @@ constexpr unsigned int popcount(Bitboard);
 template<Direction> constexpr Bitboard shift(Bitboard);
 
 } // namespace shepichess::bitboards
+
+namespace attack_maps {
+
+Bitboard knightAttacks(unsigned int);
+Bitboard kingAttacks(unsigned int);
+Bitboard bishopAttacks(unsigned int, Bitboard);
+Bitboard rookAttacks(unsigned int, Bitboard);
+Bitboard queenAttacks(unsigned int, Bitboard);
+
+} // namespace shepichess::attack_maps
 
 
 // Implementations for template and inline functions
