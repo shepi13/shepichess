@@ -81,7 +81,7 @@ Bitboard generateRandomConstant(Bitboard mask)
   static std::uniform_int_distribution<Bitboard> dist;
   do {
     constant = dist(mt) & dist(mt) & dist(mt);
-  } while(bitboards::popcount(constant * mask) & 0xff00'0000'0000'0000ULL < 6);
+  } while(bitboards::popcount((constant * mask) & 0xff00'0000'0000'0000ULL) < 6);
   return constant; 
 }
 
@@ -118,7 +118,7 @@ MagicData generateMagic(int square, bool rook)
       Bitboard hash = (blockers[i] * constant) >> (64 - shift);
       if(magic_attacks[hash] == 0) magic_attacks[hash] = attacks[i]; 
       // Hash collision, need to try a new magic number
-      if(magic_attacks[hash] != attacks[i]) {
+      else if(magic_attacks[hash] != attacks[i]) {
         success = false;
         break;
       }
