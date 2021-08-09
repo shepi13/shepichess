@@ -10,9 +10,9 @@ jobs:
   linux-gcc:
     docker:
       - image: cimg/base:2021.04
-      - environment:
-        CC: gcc-9
-        CXX: g++-9
+    environment:
+      CC: gcc-9
+      CXX: g++-9
     steps:
     # Initial Git checkout with submodules
       - checkout
