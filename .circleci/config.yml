@@ -80,7 +80,7 @@ jobs:
           command: git submodule update --init --recursive
       - run:
           name: Install CMAKE
-          command: choco install cmake -y 
+          command: choco install cmake -y; $Env:Path+=";$Env:ProgramFiles\CMake\bin";
       - run:
           name: Configure with Cmake
           command: cmake -H. -Bbuild
@@ -91,9 +91,20 @@ jobs:
           name: Test
           command: 'cd build && tests/engineTests'
 
+
 workflows:
   version: 2
-  run-all:
+  commit:
     jobs:
       - linux-gcc
       - windows
+  nightly:
+    jobs:
+      - linux-gcc
+      - windows
+    triggers:
+      - schedule:
+          cron: "0 0 * * *"
+          filters:
+            branches:
+              only: main
