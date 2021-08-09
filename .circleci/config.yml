@@ -86,10 +86,10 @@ jobs:
           command: $Env:Path+=";$Env:ProgramFiles\CMake\bin"; cmake . -Bbuild
       - run:
           name: Build
-          command: cd build && make -j16
+          command: cd build; cmake --build .
       - run:
           name: Test
-          command: 'cd build && tests/engineTests'
+          command: 'cd build; tests\Debug\engineTests'
 
 
 workflows:
