@@ -88,7 +88,10 @@ jobs:
           command: $Env:Path+=";$Env:ProgramFiles\CMake\bin"; cd build; cmake --build .
       - run:
           name: Test
-          command: 'cd build; mkdir testresults; tests\Debug\engineTests -r junit >testresults\testEngine.xml'
+          command: >-
+            cd build; 
+            mkdir testresults; 
+            tests\Debug\engineTests -r junit | Out-File -FilePath testresults\testEngine.xml -Encoding ASCII
       - store_test_results:
           path: 'build\testresults'
 
