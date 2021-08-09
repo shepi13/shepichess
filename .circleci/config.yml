@@ -2,13 +2,17 @@
 version: 2.1
 
 # TODO: Add nightly builds to test windows/clang for arch specific functions
-# TODO: Add store_test_results step
+
+orbs:
+  circleci/windows@2.4.0
 
 jobs:
-  build:
+  linux-gcc:
     docker:
       - image: cimg/base:2021.04
-
+      - environment:
+        CC: gcc-9
+        CXX: g++-9
     steps:
     # Initial Git checkout with submodules
       - checkout
@@ -65,3 +69,31 @@ jobs:
           command: 'cd build && mkdir testresults && tests/engineTests -r junit >testresults/testEngine.xml'
       - store_test_results:
           path: 'build/testresults'
+
+
+  windows:
+    executor: win/default
+    steps:
+      - checkout
+      - run:
+        name: Install git submodules
+        command: git submodule update --init --recursive
+      - run:
+        name: Install CMAKE
+        command: choco install cmake -y 
+      - run:
+        name: Configure with Cmake
+        command: cmake -H. -Bbuild
+      - run:
+        name: Build
+        command: cd build && make -j16
+      - run:
+        name: Test
+        command: 'cd build && tests/engineTests'
+
+workflows:
+  version: 2
+  run-all:
+    jobs:
+      - linux-gcc
+      - windows
