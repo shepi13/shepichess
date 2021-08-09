@@ -7,6 +7,10 @@
 #include <bits>
 #elif defined(_WIN32)
 #include <intrin.h>
+#pragma intrinsic(_BitScanForward)
+#if defined(_WIN64)
+#pragma intrinsic(_BitScanForward64)
+#endif
 #endif
 
 namespace shepichess {
@@ -49,8 +53,8 @@ constexpr bool getbit(Bitboard, unsigned int);
 constexpr Bitboard setbit(Bitboard, unsigned int);
 constexpr Bitboard clearbit(Bitboard, unsigned int);
 constexpr Bitboard poplsb(Bitboard);
-constexpr int bitscan(Bitboard);
-constexpr unsigned int popcount(Bitboard);
+inline int bitscan(Bitboard);
+inline unsigned int popcount(Bitboard);
 template<Direction> constexpr Bitboard shift(Bitboard);
 
 } // namespace shepichess::bitboards
@@ -93,21 +97,19 @@ constexpr Bitboard bitboards::poplsb(Bitboard board)
   return board & (board - 1);
 }
 
-constexpr int bitboards::bitscan(Bitboard board) 
+inline int bitboards::bitscan(Bitboard board) 
 {
 #if defined(__clang__) || defined(__GNUC__)
   return __builtin_ffsll(board) - 1;
 
 #elif defined(_WIN64)
-  #pragma intrinsic(_BitScanForward64)
-  unsigned long idx;
+  unsigned long idx = 0;
   if(_BitScanForward64(&idx, board)) {
     return idx;
   }
   return -1;
 
 #elif defined(_WIN32)
-#pragma intrinsic(_BitScanForward)
   unsigned long lower, upper;
   if(_BitScanForward(&lower, static_cast<unsigned long>(board))) {
     return lower;
@@ -120,7 +122,7 @@ constexpr int bitboards::bitscan(Bitboard board)
 #endif
 }
 
-constexpr unsigned int bitboards::popcount(Bitboard board)
+inline unsigned int bitboards::popcount(Bitboard board)
 {
 #if __cplusplus > 202002L
   return std::popcount(board);
@@ -129,11 +131,11 @@ constexpr unsigned int bitboards::popcount(Bitboard board)
   return __builtin_popcountll(board);
 
 #elif defined(_WIN64)
-  return __popcount64(board);
+  return __popcnt64(board);
 
 #elif defined(_WIN32)
-  return __popcount(static_cast<unsigned long>(board) + 
-         __popcount(static_cast<unsigned long>(board >> 32));
+  return __popcnt(static_cast<unsigned long>(board) + 
+         __popcnt(static_cast<unsigned long>(board >> 32));
 
 #elif defined(__INTEL_COMPILER)
   return static_cast<int>(_mm_popcnt_u64(board));
