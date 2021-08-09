@@ -4,7 +4,7 @@ version: 2.1
 # TODO: Add nightly builds to test windows/clang for arch specific functions
 
 orbs:
-  circleci/windows@2.4.0
+  win: circleci/windows@2.4.0
 
 jobs:
   linux-gcc:
@@ -76,20 +76,20 @@ jobs:
     steps:
       - checkout
       - run:
-        name: Install git submodules
-        command: git submodule update --init --recursive
+          name: Install git submodules
+          command: git submodule update --init --recursive
       - run:
-        name: Install CMAKE
-        command: choco install cmake -y 
+          name: Install CMAKE
+          command: choco install cmake -y 
       - run:
-        name: Configure with Cmake
-        command: cmake -H. -Bbuild
+          name: Configure with Cmake
+          command: cmake -H. -Bbuild
       - run:
-        name: Build
-        command: cd build && make -j16
+          name: Build
+          command: cd build && make -j16
       - run:
-        name: Test
-        command: 'cd build && tests/engineTests'
+          name: Test
+          command: 'cd build && tests/engineTests'
 
 workflows:
   version: 2
