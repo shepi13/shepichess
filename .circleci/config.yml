@@ -44,7 +44,7 @@ jobs:
     # Build
       - run:
           name: Configure with CMAKE
-          command: 'cmake -H. -Bbuild'
+          command: 'cmake . -Bbuild'
       - run:
           name: Build
           command: 'cd build && make -j$(nproc)'
@@ -83,7 +83,7 @@ jobs:
           command: choco install cmake -y;
       - run:
           name: Configure with Cmake
-          command: $Env:Path+=";$Env:ProgramFiles\CMake\bin"; cmake -H. -Bbuild
+          command: $Env:Path+=";$Env:ProgramFiles\CMake\bin"; cmake . -Bbuild
       - run:
           name: Build
           command: cd build && make -j16
