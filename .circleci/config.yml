@@ -86,7 +86,7 @@ jobs:
           command: $Env:Path+=";$Env:ProgramFiles\CMake\bin"; cmake . -Bbuild
       - run:
           name: Build
-          command: cd build; cmake --build .
+          command: $Env:Path+=";$Env:ProgramFiles\CMake\bin"; cd build; cmake --build .
       - run:
           name: Test
           command: 'cd build; tests\Debug\engineTests'
