@@ -70,7 +70,6 @@ jobs:
       - store_test_results:
           path: 'build/testresults'
 
-
   windows:
     executor: win/default
     steps:
@@ -89,7 +88,9 @@ jobs:
           command: $Env:Path+=";$Env:ProgramFiles\CMake\bin"; cd build; cmake --build .
       - run:
           name: Test
-          command: 'cd build; tests\Debug\engineTests'
+          command: 'cd build; mkdir testresults; tests\Debug\engineTests -r junit >testresults\testEngine.xml'
+      - store_test_results:
+          path: 'build\testresults'
 
 
 workflows:
