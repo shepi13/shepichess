@@ -99,7 +99,6 @@ workflows:
   commit:
     jobs:
       - linux-gcc
-      - windows
   nightly:
     jobs:
       - linux-gcc
