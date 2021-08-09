@@ -1,14 +1,16 @@
 # Use the latest 2.1 version of CircleCI pipeline process engine. See: https://circleci.com/docs/2.0/configuration-reference
 version: 2.1
 
-# TODO: Add nightly builds to test windows/clang for arch specific functions
-# TODO: Add store_test_results step
+orbs:
+  win: circleci/windows@2.4.0
 
 jobs:
-  build:
+  linux-gcc:
     docker:
       - image: cimg/base:2021.04
-
+    environment:
+      CC: gcc-9
+      CXX: g++-9
     steps:
     # Initial Git checkout with submodules
       - checkout
@@ -23,14 +25,14 @@ jobs:
           command: >-
             echo $(git ls-tree HEAD third_party/spdlog | awk {'print $3'}) >.spdlog_hash
       - restore_cache:
-          key: spdlogcache-v2-{{ checksum ".spdlog_hash" }}
+          key: spdlogcache-v3-{{ checksum ".spdlog_hash" }}
       # Catch2
       - run:
           name: Catch2 checksum
           command: >-
             echo $(git ls-tree HEAD third_party/Catch2 | awk {'print $3'}) >.catch2_hash
       - restore_cache:
-          key: catch2cache-v3-{{ checksum ".catch2_hash" }} 
+          key: catch2cache-v4-{{ checksum ".catch2_hash" }} 
         
     # Install required tools
       - run:
@@ -40,7 +42,7 @@ jobs:
     # Build
       - run:
           name: Configure with CMAKE
-          command: 'cmake -H. -Bbuild'
+          command: 'cmake . -Bbuild'
       - run:
           name: Build
           command: 'cd build && make -j$(nproc)'
@@ -48,13 +50,13 @@ jobs:
     # Save Cache
       # spdlog
       - save_cache:
-          key: spdlogcache-v2-{{ checksum ".spdlog_hash" }}
+          key: spdlogcache-v3-{{ checksum ".spdlog_hash" }}
           paths: 
             - bin/spdlog
             - build/spdlog
       # Catch2
       - save_cache:
-          key: catch2cache-v3-{{ checksum ".catch2_hash" }}
+          key: catch2cache-v4-{{ checksum ".catch2_hash" }}
           paths:
             - bin/Catch2
             - build/Catch2
@@ -65,3 +67,46 @@ jobs:
           command: 'cd build && mkdir testresults && tests/engineTests -r junit >testresults/testEngine.xml'
       - store_test_results:
           path: 'build/testresults'
+
+  windows:
+    executor: win/default
+    steps:
+      - checkout
+      - run:
+          name: Install git submodules
+          command: git submodule update --init --recursive
+      - run:
+          name: Install CMAKE
+          command: choco install cmake -y;
+      - run:
+          name: Configure with Cmake
+          command: $Env:Path+=";$Env:ProgramFiles\CMake\bin"; cmake . -Bbuild
+      - run:
+          name: Build
+          command: $Env:Path+=";$Env:ProgramFiles\CMake\bin"; cd build; cmake --build .
+      - run:
+          name: Test
+          command: >-
+            cd build; 
+            mkdir testresults; 
+            tests\Debug\engineTests -r junit | Out-File -FilePath testresults\testEngine.xml -Encoding ASCII
+      - store_test_results:
+          path: 'build\testresults'
+
+
+workflows:
+  version: 2
+  commit:
+    jobs:
+      - linux-gcc
+      - windows
+  nightly:
+    jobs:
+      - linux-gcc
+      - windows
+    triggers:
+      - schedule:
+          cron: "0 0 * * *"
+          filters:
+            branches:
+              only: main
