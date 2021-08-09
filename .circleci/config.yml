@@ -80,10 +80,12 @@ jobs:
           command: git submodule update --init --recursive
       - run:
           name: Install CMAKE
-          command: choco install cmake -y; $Env:Path+=";$Env:ProgramFiles\CMake\bin"; $Env:Path
+          command: choco install cmake -y;
       - run:
           name: Configure with Cmake
-          command: $Env:Path; cmake -H. -Bbuild
+          command: >
+            $Env:Path+=";$Env:ProgramFiles\CMake\bin"
+            cmake -H. -Bbuild
       - run:
           name: Build
           command: cd build && make -j16
