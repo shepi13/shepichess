@@ -102,7 +102,6 @@ workflows:
   nightly:
     jobs:
       - linux-gcc
-      - windows
     triggers:
       - schedule:
           cron: "0 0 * * *"
