@@ -75,7 +75,7 @@ Bitboard generateMask(int square, bool rook)
 
 Bitboard generateRandomConstant(Bitboard mask)
 {
-  Bitboard constant;
+  Bitboard constant = 0ULL;
   static std::random_device rd;
   static std::mt19937_64 mt {rd()};
   static std::uniform_int_distribution<Bitboard> dist;
@@ -157,10 +157,10 @@ Bitboard generateKnightAttacks(int square)
 
 } // namespace
 
-static MagicData rookAttackMap[64];
-static MagicData bishopAttackMap[64];
-static Bitboard knightAttackMap[64];
-static Bitboard kingAttackMap[64];
+static std::array<MagicData, 64> rookAttackMap;
+static std::array<MagicData, 64> bishopAttackMap;
+static std::array<Bitboard, 64> knightAttackMap;
+static std::array<Bitboard, 64> kingAttackMap;
 
 void bitboards::init()
 {
@@ -193,14 +193,14 @@ Bitboard attack_maps::kingAttacks(unsigned int square)
 Bitboard attack_maps::bishopAttacks(unsigned int square, Bitboard blockers)
 {
   const MagicData& magic = bishopAttackMap[square];
-  int hash = ((magic.mask & blockers) * magic.constant) >> (64 - magic.shift);
+  unsigned int hash = ((magic.mask & blockers) * magic.constant) >> (64 - magic.shift);
   return magic.attack_map[hash];
 }
 
 Bitboard attack_maps::rookAttacks(unsigned int square, Bitboard blockers)
 {
   const MagicData& magic = rookAttackMap[square];
-  int hash = ((magic.mask & blockers) * magic.constant) >> (64 - magic.shift);
+  unsigned int hash = ((magic.mask & blockers) * magic.constant) >> (64 - magic.shift);
   return magic.attack_map[hash];
 }
 

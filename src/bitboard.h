@@ -54,7 +54,7 @@ constexpr Bitboard setbit(Bitboard, unsigned int);
 constexpr Bitboard clearbit(Bitboard, unsigned int);
 constexpr Bitboard poplsb(Bitboard);
 inline int bitscan(Bitboard);
-inline unsigned int popcount(Bitboard);
+inline int popcount(Bitboard);
 template<Direction>
 constexpr Bitboard shift(Bitboard);
 
@@ -119,7 +119,7 @@ inline int bitboards::bitscan(Bitboard board)
 #endif
 }
 
-inline unsigned int bitboards::popcount(Bitboard board)
+inline int bitboards::popcount(Bitboard board)
 {
 #if __cplusplus > 202002L
   return std::popcount(board);
