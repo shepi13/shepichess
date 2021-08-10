@@ -104,8 +104,8 @@ void UCIApp::setDebugMode(const std::string& args)
 void UCIApp::setOption(const std::string& args) 
 {
   std::smatch nameMatch, valueMatch;
-  std::regex_search(args, nameMatch, std::regex("name\\s*(.*?[^\\s])\\s*(?:$|value)"));
-  std::regex_search(args, valueMatch, std::regex("value\\s*(.*?[^\\s])\\s*(?:$|name)"));
+  std::regex_search(args, nameMatch, std::regex(R"(name\s*(.*?[^\s])\s*(?:$|value))"));
+  std::regex_search(args, valueMatch, std::regex(R"(value\s*(.*?[^\s])\s*(?:$|name))"));
   std::string name = nameMatch[1];
   std::string value = valueMatch[1];
   if(!name.size()) {

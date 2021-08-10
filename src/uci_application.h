@@ -14,8 +14,12 @@ const inline std::string kEngineAuthor{"shepi13"};
 class UCIApp {
 public:    
   UCIApp(std::istream& = std::cin, std::ostream& = std::cout);
+  ~UCIApp() = default;
+
   UCIApp(const UCIApp&) = delete;
+  UCIApp(UCIApp&&) = delete;
   UCIApp& operator=(const UCIApp&) = delete;
+  UCIApp& operator=(UCIApp&&) = delete;
 
   void mainLoop();
 private:
