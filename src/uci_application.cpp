@@ -81,7 +81,10 @@ void UCIApp::respondUCI()
   sendUCICommand("uciok");
 }
 
-void UCIApp::respondReady() { sendUCICommand("readyok"); }
+void UCIApp::respondReady()
+{
+  sendUCICommand("readyok");
+}
 
 // TODO: Probably just will clear hash tables?
 void UCIApp::uciNewGame() {}

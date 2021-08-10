@@ -185,7 +185,10 @@ Bitboard attack_maps::knightAttacks(unsigned int square)
   return knightAttackMap[square];
 }
 
-Bitboard attack_maps::kingAttacks(unsigned int square) { return kingAttackMap[square]; }
+Bitboard attack_maps::kingAttacks(unsigned int square)
+{
+  return kingAttackMap[square];
+}
 
 Bitboard attack_maps::bishopAttacks(unsigned int square, Bitboard blockers)
 {

@@ -4,13 +4,13 @@
 #include <string>
 
 #if __cplusplus >= 202002L
-#include <bits>
+#  include <bits>
 #elif defined(_WIN32)
-#include <intrin.h>
-#pragma intrinsic(_BitScanForward)
-#if defined(_WIN64)
-#pragma intrinsic(_BitScanForward64)
-#endif
+#  include <intrin.h>
+#  pragma intrinsic(_BitScanForward)
+#  if defined(_WIN64)
+#    pragma intrinsic(_BitScanForward64)
+#  endif
 #endif
 
 namespace shepichess {
@@ -72,7 +72,10 @@ Bitboard queenAttacks(unsigned int, Bitboard);
 
 // Implementations for template and inline functions
 
-constexpr Bitboard bitboards::fromSquare(unsigned int idx) { return 1ULL << idx; }
+constexpr Bitboard bitboards::fromSquare(unsigned int idx)
+{
+  return 1ULL << idx;
+}
 
 constexpr bool bitboards::getbit(Bitboard board, unsigned int idx)
 {
@@ -89,30 +92,30 @@ constexpr Bitboard bitboards::clearbit(Bitboard board, unsigned int idx)
   return ~fromSquare(idx) & board;
 }
 
-constexpr Bitboard bitboards::poplsb(Bitboard board) { return board & (board - 1); }
+constexpr Bitboard bitboards::poplsb(Bitboard board)
+{
+  return board & (board - 1);
+}
 
 inline int bitboards::bitscan(Bitboard board)
 {
 #if defined(__clang__) || defined(__GNUC__)
   return __builtin_ffsll(board) - 1;
-
 #elif defined(_WIN64)
   unsigned long idx = 0;
   if (_BitScanForward64(&idx, board)) {
     return idx;
   }
   return -1;
-
 #elif defined(_WIN32)
   unsigned long lower, upper;
   if (_BitScanForward(&lower, static_cast<unsigned long>(board))) {
     return lower;
   }
   return _BitScanForward(&upper, static_cast<unsigned long>(board >> 32)) ? upper : -1;
-
 #else
 // Todo: Use DeBruijin bitscan to support more compilers
-#error "Forward BitScan not implemented, use a supported compiler"
+#  error "Forward BitScan not implemented, use a supported compiler"
 #endif
 }
 
@@ -120,20 +123,15 @@ inline unsigned int bitboards::popcount(Bitboard board)
 {
 #if __cplusplus > 202002L
   return std::popcount(board);
-
 #elif defined(__clang__) || defined(__GNUC__)
   return __builtin_popcountll(board);
-
 #elif defined(_WIN64)
   return __popcnt64(board);
-
 #elif defined(_WIN32)
   return __popcnt(static_cast<unsigned long>(board) + 
          __popcnt(static_cast<unsigned long>(board >> 32));
-
 #elif defined(__INTEL_COMPILER)
   return static_cast<int>(_mm_popcnt_u64(board));
-
 #else
   // Perform Bit Hackery - TODO: Explain this in documentation somewhere
   const int mask2 = 0x3333'3333'3333'3333ULL;
