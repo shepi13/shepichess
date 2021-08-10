@@ -4,7 +4,8 @@
 
 using shepichess::Bitboard, shepichess::Direction;
 
-TEST_CASE("bitboards::getbit", "[bitboard]") {
+TEST_CASE("bitboards::getbit", "[bitboard]")
+{
   using shepichess::bitboards::getbit;
   REQUIRE(getbit(10, 0) == 0);
   REQUIRE(getbit(10, 1) == 1);
@@ -14,7 +15,8 @@ TEST_CASE("bitboards::getbit", "[bitboard]") {
   REQUIRE(getbit(0x7000'0000'0000'0000ULL, 63) == 0);
 }
 
-TEST_CASE("bitboards::setbit", "[bitboard]") {
+TEST_CASE("bitboards::setbit", "[bitboard]")
+{
   using shepichess::bitboards::setbit;
   REQUIRE(setbit(10, 2) == 14);
   REQUIRE(setbit(20, 3) == 28);
@@ -23,7 +25,8 @@ TEST_CASE("bitboards::setbit", "[bitboard]") {
   REQUIRE(setbit(0, 63) == 0x8000'0000'0000'0000ULL);
 }
 
-TEST_CASE("bitboards::clearbit", "[bitboard]") {
+TEST_CASE("bitboards::clearbit", "[bitboard]")
+{
   using shepichess::bitboards::clearbit;
   REQUIRE(clearbit(10, 1) == 8);
   REQUIRE(clearbit(20, 4) == 4);
@@ -31,7 +34,8 @@ TEST_CASE("bitboards::clearbit", "[bitboard]") {
   REQUIRE(clearbit(0xf000'0000'0000'0000ULL, 63) == 0x7000'0000'0000'0000ULL);
 }
 
-TEST_CASE("bitboards::poplsb", "[bitboard]") {
+TEST_CASE("bitboards::poplsb", "[bitboard]")
+{
   using shepichess::bitboards::poplsb;
   REQUIRE(poplsb(10) == 8);
   REQUIRE(poplsb(20) == 16);
@@ -39,7 +43,8 @@ TEST_CASE("bitboards::poplsb", "[bitboard]") {
   REQUIRE(poplsb(0x8000'0000'0000'0000ULL) == 0);
 }
 
-TEST_CASE("bitboards::bitscan", "[bitboard]") {
+TEST_CASE("bitboards::bitscan", "[bitboard]")
+{
   using shepichess::bitboards::bitscan;
   REQUIRE(bitscan(10) == 1);
   REQUIRE(bitscan(20) == 2);
@@ -48,7 +53,8 @@ TEST_CASE("bitboards::bitscan", "[bitboard]") {
   REQUIRE(bitscan(0x8000'0000'0000'0000ULL) == 63);
 }
 
-TEST_CASE("bitboards::popcount", "[bitboard]") {
+TEST_CASE("bitboards::popcount", "[bitboard]")
+{
   using shepichess::bitboards::popcount;
   REQUIRE(popcount(10) == 2);
   REQUIRE(popcount(20) == 2);
@@ -58,9 +64,10 @@ TEST_CASE("bitboards::popcount", "[bitboard]") {
 }
 
 // Test that shifting a fromSquare in the center works as expected
-TEST_CASE("bitboards::shift center", "[bitboard]") {
-  using shepichess::bitboards::shift;
+TEST_CASE("bitboards::shift center", "[bitboard]")
+{
   using shepichess::bitboards::fromSquare;
+  using shepichess::bitboards::shift;
 
   Bitboard e4 = fromSquare(27), d4 = fromSquare(28);
   Bitboard e5 = fromSquare(35), d5 = fromSquare(36);
@@ -75,9 +82,10 @@ TEST_CASE("bitboards::shift center", "[bitboard]") {
 }
 
 // Test that shifting doesn't wrap around across edges
-TEST_CASE("bitboards::shift edge", "[bitboard]") {
-  using shepichess::bitboards::shift;
+TEST_CASE("bitboards::shift edge", "[bitboard]")
+{
   using shepichess::bitboards::fromSquare;
+  using shepichess::bitboards::shift;
 
   Bitboard a4 = fromSquare(31), h4 = fromSquare(24);
   Bitboard e1 = fromSquare(3), e8 = fromSquare(59);
@@ -99,7 +107,8 @@ TEST_CASE("bitboards::shift edge", "[bitboard]") {
   REQUIRE(shift<Direction::SouthEast>(e1) == 0);
 }
 
-TEST_CASE("attack_maps::knightAttacks", "[bitboard, attack_maps]") {
+TEST_CASE("attack_maps::knightAttacks", "[bitboard, attack_maps]")
+{
   using shepichess::attack_maps::knightAttacks;
   shepichess::bitboards::init();
   REQUIRE(knightAttacks(27) == 0x00'00'14'22'00'22'14'00); // e4
@@ -109,7 +118,8 @@ TEST_CASE("attack_maps::knightAttacks", "[bitboard, attack_maps]") {
   REQUIRE(knightAttacks(24) == 0x00'00'02'04'00'04'02'00); // h4
 }
 
-TEST_CASE("attack_maps::kingAttacks", "[bitboard, attack_maps]") {
+TEST_CASE("attack_maps::kingAttacks", "[bitboard, attack_maps]")
+{
   using shepichess::attack_maps::kingAttacks;
   shepichess::bitboards::init();
   REQUIRE(kingAttacks(27) == 0x00'00'00'1c'14'1c'00'00);
@@ -119,7 +129,8 @@ TEST_CASE("attack_maps::kingAttacks", "[bitboard, attack_maps]") {
   REQUIRE(kingAttacks(24) == 0x00'00'00'03'02'03'00'00);
 }
 
-TEST_CASE("attack_maps::bishopAttacks", "[bitboard, attack_maps]") {
+TEST_CASE("attack_maps::bishopAttacks", "[bitboard, attack_maps]")
+{
   using shepichess::attack_maps::bishopAttacks;
   shepichess::bitboards::init();
   Bitboard blockers = 0xff'ff'ff'00'00'00'ff'ff;
@@ -127,7 +138,8 @@ TEST_CASE("attack_maps::bishopAttacks", "[bitboard, attack_maps]") {
   REQUIRE(bishopAttacks(27, blockers) == 0x00'00'22'14'00'14'22'00);
 }
 
-TEST_CASE("attack_maps::rookAttacks", "[bitboard, attack_maps]") {
+TEST_CASE("attack_maps::rookAttacks", "[bitboard, attack_maps]")
+{
   using shepichess::attack_maps::rookAttacks;
   shepichess::bitboards::init();
   Bitboard blockers = 0xff'ff'c3'c3'c3'c3'ff'ff;
@@ -135,7 +147,8 @@ TEST_CASE("attack_maps::rookAttacks", "[bitboard, attack_maps]") {
   REQUIRE(rookAttacks(27, blockers) == 0x00'08'08'08'76'08'08'00);
 }
 
-TEST_CASE("attack_maps::queenAttacks", "[bitboard, attack_maps]") {
+TEST_CASE("attack_maps::queenAttacks", "[bitboard, attack_maps]")
+{
   using shepichess::attack_maps::queenAttacks;
   shepichess::bitboards::init();
   Bitboard blockers = 0xff'ff'c3'c3'c3'c3'ff'ff;

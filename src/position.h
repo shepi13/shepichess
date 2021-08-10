@@ -3,7 +3,6 @@
 namespace shepichess {
 
 class Position {
-
 };
 
 } // namespace shepichess

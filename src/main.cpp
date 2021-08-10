@@ -1,6 +1,7 @@
 #include "uci_application.h"
 
-int main() {
+int main()
+{
   shepichess::UCIApp app;
   app.mainLoop();
 }

@@ -8,11 +8,11 @@
 
 namespace shepichess {
 
-const inline std::string kEngineName{"shepichess"};
-const inline std::string kEngineAuthor{"shepi13"};
+const inline std::string kEngineName {"shepichess"};
+const inline std::string kEngineAuthor {"shepi13"};
 
 class UCIApp {
-public:    
+  public:
   UCIApp(std::istream& = std::cin, std::ostream& = std::cout);
   ~UCIApp() = default;
 
@@ -22,19 +22,20 @@ public:
   UCIApp& operator=(UCIApp&&) = delete;
 
   void mainLoop();
-private:
+
+  private:
   Position position;
   UCIConfig config;
   bool uciDebugMode = false;
   std::istream& in;
   std::ostream& out;
 
-  //IO Handlers
+  // IO Handlers
   struct UCICommand;
   UCICommand getUCICommand();
   void sendUCICommand(const std::string&);
 
-  //UCI Command Handlers:
+  // UCI Command Handlers:
   void respondUCI();
   void respondReady();
   void uciNewGame();
@@ -45,6 +46,5 @@ private:
   void stopCalculation();
   void ponderhit();
 };
-  
 
 } // namespace shepichess

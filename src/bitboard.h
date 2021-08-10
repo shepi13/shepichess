@@ -14,7 +14,7 @@
 #endif
 
 namespace shepichess {
-    
+
 using Bitboard = std::uint64_t;
 
 enum class Direction {
@@ -55,9 +55,10 @@ constexpr Bitboard clearbit(Bitboard, unsigned int);
 constexpr Bitboard poplsb(Bitboard);
 inline int bitscan(Bitboard);
 inline unsigned int popcount(Bitboard);
-template<Direction> constexpr Bitboard shift(Bitboard);
+template<Direction>
+constexpr Bitboard shift(Bitboard);
 
-} // namespace shepichess::bitboards
+} // namespace bitboards
 
 namespace attack_maps {
 
@@ -67,19 +68,15 @@ Bitboard bishopAttacks(unsigned int, Bitboard);
 Bitboard rookAttacks(unsigned int, Bitboard);
 Bitboard queenAttacks(unsigned int, Bitboard);
 
-} // namespace shepichess::attack_maps
-
+} // namespace attack_maps
 
 // Implementations for template and inline functions
 
-constexpr Bitboard bitboards::fromSquare(unsigned int idx)
-{
-  return 1ULL << idx;
-}
+constexpr Bitboard bitboards::fromSquare(unsigned int idx) { return 1ULL << idx; }
 
 constexpr bool bitboards::getbit(Bitboard board, unsigned int idx)
 {
-  return fromSquare(idx) & board; 
+  return fromSquare(idx) & board;
 }
 
 constexpr Bitboard bitboards::setbit(Bitboard board, unsigned int idx)
@@ -87,36 +84,33 @@ constexpr Bitboard bitboards::setbit(Bitboard board, unsigned int idx)
   return fromSquare(idx) | board;
 }
 
-constexpr Bitboard bitboards::clearbit(Bitboard board, unsigned int idx) 
+constexpr Bitboard bitboards::clearbit(Bitboard board, unsigned int idx)
 {
   return ~fromSquare(idx) & board;
 }
 
-constexpr Bitboard bitboards::poplsb(Bitboard board) 
-{
-  return board & (board - 1);
-}
+constexpr Bitboard bitboards::poplsb(Bitboard board) { return board & (board - 1); }
 
-inline int bitboards::bitscan(Bitboard board) 
+inline int bitboards::bitscan(Bitboard board)
 {
 #if defined(__clang__) || defined(__GNUC__)
   return __builtin_ffsll(board) - 1;
 
 #elif defined(_WIN64)
   unsigned long idx = 0;
-  if(_BitScanForward64(&idx, board)) {
+  if (_BitScanForward64(&idx, board)) {
     return idx;
   }
   return -1;
 
 #elif defined(_WIN32)
   unsigned long lower, upper;
-  if(_BitScanForward(&lower, static_cast<unsigned long>(board))) {
+  if (_BitScanForward(&lower, static_cast<unsigned long>(board))) {
     return lower;
   }
   return _BitScanForward(&upper, static_cast<unsigned long>(board >> 32)) ? upper : -1;
 
-#else   
+#else
 // Todo: Use DeBruijin bitscan to support more compilers
 #error "Forward BitScan not implemented, use a supported compiler"
 #endif
@@ -151,16 +145,16 @@ inline unsigned int bitboards::popcount(Bitboard board)
 }
 
 template<Direction dir>
-constexpr Bitboard bitboards::shift(Bitboard board) 
+constexpr Bitboard bitboards::shift(Bitboard board)
 {
-  if constexpr(dir == Direction::North) return (board << 8); 
-  if constexpr(dir == Direction::South) return (board >> 8);
-  if constexpr(dir == Direction::East) return (board >> 1) & ~kFileA;
-  if constexpr(dir == Direction::West) return (board << 1) & ~kFileH;
-  if constexpr(dir == Direction::NorthEast) return (board << 7) & ~kFileA;
-  if constexpr(dir == Direction::SouthEast) return (board >> 9) & ~kFileA;
-  if constexpr(dir == Direction::NorthWest) return (board << 9) & ~kFileH;
-  if constexpr(dir == Direction::SouthWest) return (board >> 7) & ~kFileH;
+  if constexpr (dir == Direction::North) return (board << 8);
+  if constexpr (dir == Direction::South) return (board >> 8);
+  if constexpr (dir == Direction::East) return (board >> 1) & ~kFileA;
+  if constexpr (dir == Direction::West) return (board << 1) & ~kFileH;
+  if constexpr (dir == Direction::NorthEast) return (board << 7) & ~kFileA;
+  if constexpr (dir == Direction::SouthEast) return (board >> 9) & ~kFileA;
+  if constexpr (dir == Direction::NorthWest) return (board << 9) & ~kFileH;
+  if constexpr (dir == Direction::SouthWest) return (board >> 7) & ~kFileH;
 }
 
 } // namespace shepichess
