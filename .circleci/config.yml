@@ -58,14 +58,22 @@ commands:
           <<# parameters.windows >> $Env:Path+=";$Env:ProgramFiles\CMake\bin"; <</ parameters.windows >>
           cmake . -Bbuild;
           cd build;
-          cmake --build
+          cmake --build .
   test:
     description: "Tests and stores results"
+    parameters:
+      windows:
+        type: boolean
+        default: false
     steps:
       - run: >-
           cd build; 
           mkdir testresults; 
-          tests/engineTests -r junit >testresults/testEngine.xml'
+          tests/engineTests -r junit           
+          <<# parameters.windows >> 
+            | Out-File -FilePath testresults\testEngine.xml -Encoding ASCII 
+          <</ parameters.windows >>
+          <<^ parameters.windows >> >testresults/testEngine.xml <</ parameters.windows >>
       - store_test_results:
           path: 'build/testresults'
 
