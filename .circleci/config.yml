@@ -9,7 +9,9 @@ commands:
     description: "Installs git submodules recursively"
     steps:
       - checkout
-      - run: git submodule update --init --recursive
+      - run: 
+          name: "Install submodules"
+          command: "git submodule update --init --recursive"
 
   install_cmake:
     description: "Installs CMake"
@@ -19,20 +21,24 @@ commands:
       sudo:
         type: boolean
     steps:
-      - run: >-
-          <<# parameters.sudo >> sudo <</ parameters.sudo>> 
-          << parameters.package_manager >> install cmake -y
+      - run: 
+          name: "Install Cmake"
+          command: >-
+            <<# parameters.sudo >> sudo <</ parameters.sudo>> 
+            << parameters.package_manager >> install cmake -y
 
   restore_third_party_cache:
     description: "Restores cache for 3rd party libraries and cmake files"
     steps:
-      - run: echo $(git ls-tree HEAD third_party/spdlog | awk {'print $3'}) >.spdlog_hash
-      - run: echo $(git ls-tree HEAD third_party/Catch2 | awk {'print $3'}) >.catch2_hash
+      - run: 
+          name: "Calculate hash for 3rd party libs"
+          command: >-
+            echo $(git ls-tree HEAD third_party/spdlog | awk {'print $3'}) >.spdlog_hash;
+            echo $(git ls-tree HEAD third_party/Catch2 | awk {'print $3'}) >.catch2_hash
       - restore_cache:
           key: spdlogcache-v3-{{ checksum ".spdlog_hash" }}
       - restore_cache:
           key: catch2cache-v4-{{ checksum ".catch2_hash" }} 
-
   save_third_party_cache:
     description: "Saves cache for 3rd party libraries and cmake files"
     steps:
@@ -54,11 +60,13 @@ commands:
         type: boolean
         default: false
     steps:
-      - run: >-
-          <<# parameters.windows >> $Env:Path+=";$Env:ProgramFiles\CMake\bin"; <</ parameters.windows >>
-          cmake . -Bbuild;
-          cd build;
-          cmake --build .
+      - run:
+          name: "Configure and Build"
+          commands: >-
+            <<# parameters.windows >> $Env:Path+=";$Env:ProgramFiles\CMake\bin"; <</ parameters.windows >>
+            cmake . -Bbuild;
+            cd build;
+            cmake --build .
   test:
     description: "Tests and stores results"
     parameters:
@@ -66,32 +74,37 @@ commands:
         type: boolean
         default: false
     steps:
-      - run: >-
-          cd build; 
-          mkdir testresults; 
-          tests/engineTests -r junit           
-          <<# parameters.windows >> 
-            | Out-File -FilePath testresults\testEngine.xml -Encoding ASCII 
-          <</ parameters.windows >>
-          <<^ parameters.windows >> >testresults/testEngine.xml <</ parameters.windows >>
+      - run: 
+          name: "Run tests"
+          command: >-
+            cd build; 
+            mkdir testresults; 
+            tests/engineTests -r junit           
+            <<# parameters.windows >> 
+              | Out-File -FilePath testresults\testEngine.xml -Encoding ASCII 
+            <</ parameters.windows >>
+            <<^ parameters.windows >> >testresults/testEngine.xml <</ parameters.windows >>
       - store_test_results:
           path: 'build/testresults'
-
+          
   clang_tidy:
     description: "Runs clang-tidy on changed files"
     steps:
-      - run: >-
-          git --no-pager diff --name-only main HEAD |
-          { grep -E '*.cpp' || test $? = 1; } |
-          xargs -I{} clang-tidy {} -- -isystem bin/spdlog/include -Isrc --std=c++17
-
+      - run: 
+          name: "Run clang-tidy on changed files"
+          command: >-
+            git --no-pager diff --name-only $(git merge-base main HEAD) |
+            { grep -E '*.cpp' || test $? = 1; } |
+            xargs -I{} clang-tidy {} -- -isystem bin/spdlog/include -Isrc --std=c++17
   clang_format:
     description: "Runs clang-format on changed files"
     steps:
-      - run: >-
-          git --no-pager diff --name-only main HEAD |
-          { grep -E '*.cpp|*.h' || test $? = 1; } |
-          xargs clang-format --dry-run --Werror
+      - run: 
+          name: "Run clang-format on changed files"
+          command: >-
+            git --no-pager diff --name-only $(git merge-base main HEAD) |
+            { grep -E '*.cpp|*.h' || test $? = 1; } |
+            xargs clang-format --dry-run --Werror
 
   fullbuild_linux:
     description: "Full linux build with caching"
@@ -104,7 +117,6 @@ commands:
       - restore_third_party_cache
       - build
       - save_third_party_cache
-
   fullbuild_windows:
     description: "Full windows build"
     steps:
