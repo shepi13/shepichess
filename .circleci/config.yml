@@ -4,6 +4,108 @@ version: 2.1
 orbs:
   win: circleci/windows@2.4.0
 
+commands:
+  checkout_with_submodules:
+    description: "Installs git submodules recursively"
+    steps:
+      - checkout
+      - run: git submodule update --init --recursive
+
+  install_cmake:
+    description: "Installs CMake"
+    parameters:
+      package_manager:
+        type: string
+      sudo:
+        type: boolean
+    steps:
+      - run: >-
+        <<# parameters.sudo >> sudo <</ parameters.sudo>> 
+        << parameters.package_manager >> install cmake -y
+
+  restore_third_party_cache:
+    description: "Restores cache for 3rd party libraries and cmake files"
+    steps:
+      - run: echo $(git ls-tree HEAD third_party/spdlog | awk {'print $3'}) >.spdlog_hash
+      - run: echo $(git ls-tree HEAD third_party/Catch2 | awk {'print $3'}) >.catch2_hash
+      - restore_cache:
+          key: spdlogcache-v3-{{ checksum ".spdlog_hash" }}
+      - restore_cache:
+          key: catch2cache-v4-{{ checksum ".catch2_hash" }} 
+
+  save_third_pary_cache:
+    description: "Saves cache for 3rd party libraries and cmake files"
+    steps:
+      - save_cache:
+          key: spdlogcache-v3-{{ checksum ".spdlog_hash" }}
+          paths: 
+            - bin/spdlog
+            - build/spdlog
+      - save_cache:
+          key: catch2cache-v4-{{ checksum ".catch2_hash" }}
+          paths:
+            - bin/Catch2
+            - build/Catch2
+
+  build:
+    description: "Configures and builds project with cmake"
+    parameters:
+      windows:
+        type: bool
+        default: false
+    steps:
+      - run: >-
+          <<# parameters.windows >> $Env:Path+=";$Env:ProgramFiles\CMake\bin"; <</ parameters.windows >>
+          cmake . -Bbuild;
+          cd build;
+          cmake --build
+  test:
+    description: "Tests and stores results"
+    parameters:
+    steps:
+      - run: >-
+          cd build; 
+          mkdir testresults; 
+          tests/engineTests -r junit >testresults/testEngine.xml'
+      - store_test_results:
+          path: 'build/testresults'
+
+  clang_tidy:
+    description: "Runs clang-tidy on changed files"
+    steps:
+      - run: >-
+          git --no-pager diff --name-only main HEAD |
+          grep -E '*.cpp' |
+          xargs -I{} clang-tidy {} -- -isystem bin/spdlog/include -Isrc --std=c++17
+
+  clang_format:
+    description: "Runs clang-format on changed files"
+    steps:
+      - run: >-
+          git --no-pager diff --name-only main HEAD |
+          grep -E '*.cpp|*.h' |
+          xargs clang-format --dry-run --Werror
+
+  fullbuild_linux:
+    description: "Full linux build with caching"
+    steps:
+      - checkout_with_submodules
+      - install_cmake:
+          sudo: true
+          package_manager: "apt-get"
+      - restore_third_party_cache
+      - build
+      - save_third_party_cache
+
+  fullbuild_windows:
+    description: "Full windows build"
+    steps:
+      - checkout_with_submodules
+      - install_cmake:
+          sudo: false
+          package_manager: "choco"
+      - build
+
 jobs:
   linux-gcc:
     docker:
@@ -12,93 +114,39 @@ jobs:
       CC: gcc-9
       CXX: g++-9
     steps:
-    # Initial Git checkout with submodules
-      - checkout
-      - run:
-          name: Install git submodules
-          command: 'git submodule update --init --recursive'
-
-    # Restore Cache for 3rd party libs
-      # spdlog
-      - run:
-          name: Spdlog checksum
-          command: >-
-            echo $(git ls-tree HEAD third_party/spdlog | awk {'print $3'}) >.spdlog_hash
-      - restore_cache:
-          key: spdlogcache-v3-{{ checksum ".spdlog_hash" }}
-      # Catch2
-      - run:
-          name: Catch2 checksum
-          command: >-
-            echo $(git ls-tree HEAD third_party/Catch2 | awk {'print $3'}) >.catch2_hash
-      - restore_cache:
-          key: catch2cache-v4-{{ checksum ".catch2_hash" }} 
-        
-    # Install required tools
-      - run:
-          name: Install CMAKE
-          command: 'sudo apt-get update && sudo apt-get install -y cmake'
-
-    # Build
-      - run:
-          name: Configure with CMAKE
-          command: 'cmake . -Bbuild'
-      - run:
-          name: Build
-          command: 'cd build && make -j$(nproc)'
-
-    # Save Cache
-      # spdlog
-      - save_cache:
-          key: spdlogcache-v3-{{ checksum ".spdlog_hash" }}
-          paths: 
-            - bin/spdlog
-            - build/spdlog
-      # Catch2
-      - save_cache:
-          key: catch2cache-v4-{{ checksum ".catch2_hash" }}
-          paths:
-            - bin/Catch2
-            - build/Catch2
-
-    # Test
-      - run:
-          name: Test
-          command: 'cd build && mkdir testresults && tests/engineTests -r junit >testresults/testEngine.xml'
-      - store_test_results:
-          path: 'build/testresults'
-
+      - fullbuild_linux
+      - test
   windows:
     executor: win/default
     steps:
+      - fullbuild_windows
+      - test
+  lint:
+    docker:
+      - image: cimg/base:2021.04
+    environment:
+      CC: gcc-9
+      CXX: g++-9
+    steps:
+      - fullbuild_linux
+      - clang_tidy
+  format:
+    docker:
+      - image: cimg/base:2021.04
+    environment:
+      CC: gcc-9
+      CXX: g++-9
+    steps:
       - checkout
-      - run:
-          name: Install git submodules
-          command: git submodule update --init --recursive
-      - run:
-          name: Install CMAKE
-          command: choco install cmake -y;
-      - run:
-          name: Configure with Cmake
-          command: $Env:Path+=";$Env:ProgramFiles\CMake\bin"; cmake . -Bbuild
-      - run:
-          name: Build
-          command: $Env:Path+=";$Env:ProgramFiles\CMake\bin"; cd build; cmake --build .
-      - run:
-          name: Test
-          command: >-
-            cd build; 
-            mkdir testresults; 
-            tests\Debug\engineTests -r junit | Out-File -FilePath testresults\testEngine.xml -Encoding ASCII
-      - store_test_results:
-          path: 'build\testresults'
-
+      - clang_format
 
 workflows:
   version: 2
   commit:
     jobs:
       - linux-gcc
+      - lint
+      - format
   nightly:
     jobs:
       - linux-gcc
