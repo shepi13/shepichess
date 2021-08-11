@@ -82,7 +82,7 @@ commands:
     steps:
       - run: >-
           git --no-pager diff --name-only main HEAD |
-          grep -E '*.cpp' |
+          { grep -E '*.cpp' || test $? = 1; } |
           xargs -I{} clang-tidy {} -- -isystem bin/spdlog/include -Isrc --std=c++17
 
   clang_format:
