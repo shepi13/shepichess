@@ -90,7 +90,7 @@ commands:
     steps:
       - run: >-
           git --no-pager diff --name-only main HEAD |
-          grep -E '*.cpp|*.h' |
+          { grep -E '*.cpp|*.h' || test $? = 1; } |
           xargs clang-format --dry-run --Werror
 
   fullbuild_linux:
