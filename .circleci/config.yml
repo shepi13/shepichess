@@ -89,6 +89,7 @@ commands:
     description: "Full linux build with caching"
     steps:
       - checkout_with_submodules
+      - run: "sudo apt-get update"
       - install_cmake:
           sudo: true
           package_manager: "apt-get"
