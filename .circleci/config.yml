@@ -62,7 +62,7 @@ commands:
     steps:
       - run:
           name: "Configure and Build"
-          commands: >-
+          command: >-
             <<# parameters.windows >> $Env:Path+=";$Env:ProgramFiles\CMake\bin"; <</ parameters.windows >>
             cmake . -Bbuild;
             cd build;
