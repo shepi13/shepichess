@@ -158,7 +158,6 @@ jobs:
       CXX: g++-9
     steps:
       - checkout
-      - install_clang-format
       - run: 
           name: "Install clang-format"
           command: "sudo apt-get update && sudo apt-get install clang-format"
