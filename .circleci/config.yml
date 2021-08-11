@@ -20,8 +20,8 @@ commands:
         type: boolean
     steps:
       - run: >-
-        <<# parameters.sudo >> sudo <</ parameters.sudo>> 
-        << parameters.package_manager >> install cmake -y
+          <<# parameters.sudo >> sudo <</ parameters.sudo>> 
+          << parameters.package_manager >> install cmake -y
 
   restore_third_party_cache:
     description: "Restores cache for 3rd party libraries and cmake files"
@@ -33,7 +33,7 @@ commands:
       - restore_cache:
           key: catch2cache-v4-{{ checksum ".catch2_hash" }} 
 
-  save_third_pary_cache:
+  save_third_party_cache:
     description: "Saves cache for 3rd party libraries and cmake files"
     steps:
       - save_cache:
@@ -51,7 +51,7 @@ commands:
     description: "Configures and builds project with cmake"
     parameters:
       windows:
-        type: bool
+        type: boolean
         default: false
     steps:
       - run: >-
@@ -61,7 +61,6 @@ commands:
           cmake --build
   test:
     description: "Tests and stores results"
-    parameters:
     steps:
       - run: >-
           cd build; 
