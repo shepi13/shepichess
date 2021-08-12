@@ -1,6 +1,7 @@
 #include "bitboard.h"
 
 #include <array>
+#include <execution>
 #include <random>
 #include <sstream>
 
@@ -76,9 +77,9 @@ Bitboard generateMask(int square, bool rook)
 Bitboard generateRandomConstant(Bitboard mask)
 {
   Bitboard constant = 0ULL;
-  static std::random_device rd;
-  static std::mt19937_64 mt {rd()};
-  static std::uniform_int_distribution<Bitboard> dist;
+  static thread_local std::random_device rd;
+  static thread_local std::mt19937_64 mt {rd()};
+  std::uniform_int_distribution<Bitboard> dist;
   do {
     constant = dist(mt) & dist(mt) & dist(mt);
   } while (bitboards::popcount((constant * mask) & 0xff00'0000'0000'0000ULL) < 6);
@@ -131,7 +132,7 @@ MagicData generateMagic(int square, bool rook)
   }
 }
 
-Bitboard generateKingAttacks(int square)
+Bitboard kingAttackBB(int square)
 {
   using bitboards::shift;
   Bitboard squareBB = bitboards::fromSquare(square);
@@ -141,7 +142,7 @@ Bitboard generateKingAttacks(int square)
     shift<Direction::West>(squareBB) | shift<Direction::NorthWest>(squareBB);
 }
 
-Bitboard generateKnightAttacks(int square)
+Bitboard knightAttackBB(int square)
 {
   using bitboards::shift;
   Bitboard squareBB = bitboards::fromSquare(square);
@@ -161,23 +162,24 @@ static std::array<MagicData, 64> rookAttackMap;
 static std::array<MagicData, 64> bishopAttackMap;
 static std::array<Bitboard, 64> knightAttackMap;
 static std::array<Bitboard, 64> kingAttackMap;
+static std::once_flag bitboards_init_flag;
 
-void bitboards::init()
-{
-  static bool initialized = false;
-  if (initialized) return;
-
+void bitboards::init() {
+  using std::execution::par_unseq;
+  using std::placeholders::_1;
   initLogging();
-  SPDLOG_INFO("Initializing Bitboards");
-  for (int square = 0; square < 64; square++) {
-    SPDLOG_DEBUG("Initializing for square: {}", square);
-    kingAttackMap[square] = generateKingAttacks(square);
-    knightAttackMap[square] = generateKnightAttacks(square);
-    rookAttackMap[square] = generateMagic(square, true);
-    bishopAttackMap[square] = generateMagic(square, false);
-  }
-  initialized = true;
-  SPDLOG_INFO("Bitboards successfully initialized");
+  std::call_once(bitboards_init_flag, []() {
+    SPDLOG_INFO("Initializing Bitboards");    
+    std::array<int, 64> sq;
+    std::iota(sq.begin(), sq.end(), 0);
+    auto rookAttacks = std::bind(generateMagic, _1, true);
+    auto bishopAttacks = std::bind(generateMagic, _1, false);
+    std::transform(par_unseq, sq.begin(), sq.end(), kingAttackMap.begin(), kingAttackBB);
+    std::transform(par_unseq, sq.begin(), sq.end(), knightAttackMap.begin(), knightAttackBB);
+    std::transform(par_unseq, sq.begin(), sq.end(), rookAttackMap.begin(), rookAttacks);
+    std::transform(par_unseq, sq.begin(), sq.end(), bishopAttackMap.begin(), bishopAttacks);
+    SPDLOG_INFO("Bitboards successfully initialized");
+  });
 }
 
 Bitboard attack_maps::knightAttacks(unsigned int square)
