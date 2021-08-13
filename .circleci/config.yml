@@ -32,7 +32,6 @@ commands:
       - run:
           name: "Install TBB"
           command: "sudo apt install libtbb-dev"
-  install_cl
 
   restore_third_party_cache:
     description: "Restores cache for 3rd party libraries and cmake files"
