@@ -132,7 +132,7 @@ MagicData generateMagic(int square, bool rook)
   }
 }
 
-Bitboard kingAttackBB(int square)
+Bitboard genKingMap(int square)
 {
   using bitboards::shift;
   Bitboard squareBB = bitboards::fromSquare(square);
@@ -142,7 +142,7 @@ Bitboard kingAttackBB(int square)
     shift<Direction::West>(squareBB) | shift<Direction::NorthWest>(squareBB);
 }
 
-Bitboard knightAttackBB(int square)
+Bitboard genKnightMap(int square)
 {
   using bitboards::shift;
   Bitboard squareBB = bitboards::fromSquare(square);
@@ -158,50 +158,50 @@ Bitboard knightAttackBB(int square)
 
 } // namespace
 
-static std::array<MagicData, 64> rookAttackMap;
-static std::array<MagicData, 64> bishopAttackMap;
-static std::array<Bitboard, 64> knightAttackMap;
-static std::array<Bitboard, 64> kingAttackMap;
+static std::array<MagicData, 64> rookMap;
+static std::array<MagicData, 64> bishopMap;
+static std::array<Bitboard, 64> knightMap;
+static std::array<Bitboard, 64> kingMap;
 static std::once_flag bitboards_init_flag;
 
-void bitboards::init() {
+void bitboards::init()
+{
   using std::execution::par_unseq;
-  using std::placeholders::_1;
   initLogging();
   std::call_once(bitboards_init_flag, []() {
-    SPDLOG_INFO("Initializing Bitboards");    
-    std::array<int, 64> sq;
+    SPDLOG_INFO("Initializing Bitboards");
+    std::array<int, 64> sq {0};
     std::iota(sq.begin(), sq.end(), 0);
-    auto rookAttacks = std::bind(generateMagic, _1, true);
-    auto bishopAttacks = std::bind(generateMagic, _1, false);
-    std::transform(par_unseq, sq.begin(), sq.end(), kingAttackMap.begin(), kingAttackBB);
-    std::transform(par_unseq, sq.begin(), sq.end(), knightAttackMap.begin(), knightAttackBB);
-    std::transform(par_unseq, sq.begin(), sq.end(), rookAttackMap.begin(), rookAttacks);
-    std::transform(par_unseq, sq.begin(), sq.end(), bishopAttackMap.begin(), bishopAttacks);
+    auto genRookMap = [](auto&& square) { return generateMagic(square, true); };
+    auto genBishopMap = [](auto&& square) { return generateMagic(square, false); };
+    std::transform(par_unseq, sq.begin(), sq.end(), kingMap.begin(), genKingMap);
+    std::transform(par_unseq, sq.begin(), sq.end(), knightMap.begin(), genKnightMap);
+    std::transform(par_unseq, sq.begin(), sq.end(), rookMap.begin(), genRookMap);
+    std::transform(par_unseq, sq.begin(), sq.end(), bishopMap.begin(), genBishopMap);
     SPDLOG_INFO("Bitboards successfully initialized");
   });
 }
 
 Bitboard attack_maps::knightAttacks(unsigned int square)
 {
-  return knightAttackMap[square];
+  return knightMap[square];
 }
 
 Bitboard attack_maps::kingAttacks(unsigned int square)
 {
-  return kingAttackMap[square];
+  return kingMap[square];
 }
 
 Bitboard attack_maps::bishopAttacks(unsigned int square, Bitboard blockers)
 {
-  const MagicData& magic = bishopAttackMap[square];
+  const MagicData& magic = bishopMap[square];
   unsigned int hash = ((magic.mask & blockers) * magic.constant) >> (64 - magic.shift);
   return magic.attack_map[hash];
 }
 
 Bitboard attack_maps::rookAttacks(unsigned int square, Bitboard blockers)
 {
-  const MagicData& magic = rookAttackMap[square];
+  const MagicData& magic = rookMap[square];
   unsigned int hash = ((magic.mask & blockers) * magic.constant) >> (64 - magic.shift);
   return magic.attack_map[hash];
 }
