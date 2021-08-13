@@ -2,6 +2,7 @@
 
 #include <array>
 #include <execution>
+#include <mutex>
 #include <random>
 #include <sstream>
 
