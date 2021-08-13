@@ -26,6 +26,12 @@ commands:
           command: >-
             <<# parameters.sudo >> sudo <</ parameters.sudo>> 
             << parameters.package_manager >> install cmake -y
+  install_tbb:
+    description: "Install tbb on linux with apt-get"
+    steps:
+      - run:
+          name: "Install TBB"
+          command: "sudo apt install libtbb-dev"
 
   restore_third_party_cache:
     description: "Restores cache for 3rd party libraries and cmake files"
@@ -114,6 +120,7 @@ commands:
       - install_cmake:
           sudo: true
           package_manager: "apt-get"
+      - install_tbb
       - restore_third_party_cache
       - build
       - save_third_party_cache
@@ -149,6 +156,9 @@ jobs:
       CXX: g++-9
     steps:
       - fullbuild_linux
+      - run:
+          name: "Install clang-tidy"
+          command: "sudo apt-get update && sudo apt-get install clang-tidy" 
       - clang_tidy
   format:
     docker:

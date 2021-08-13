@@ -1,6 +1,7 @@
 ---
 Checks: '
 bugprone-*,
+-bugprone-lambda-function-name,
 cppcoreguidelines-*,
 -cppcoreguidelines-avoid-magic-numbers,
 -cppcoreguidelines-macro-usage,
