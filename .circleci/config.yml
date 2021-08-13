@@ -27,7 +27,7 @@ commands:
             <<# parameters.sudo >> sudo <</ parameters.sudo>> 
             << parameters.package_manager >> install cmake -y
   install_tbb:
-    decription: "Install tbb on linux with apt-get"
+    description: "Install tbb on linux with apt-get"
     steps:
       - run:
           name: "Install TBB"
