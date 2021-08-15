@@ -20,7 +20,7 @@ struct HashEntry {
 };
 
 class HashTable {
-  public:
+public:
   HashTable();
   ~HashTable() = default;
   HashTable(const HashTable&) = delete;
@@ -34,7 +34,7 @@ class HashTable {
   void stash(HashKey key, HashEntry value);
   HashEntry probe(HashKey key, bool& found) const;
 
-  private:
+private:
   std::vector<HashEntry> table;
   size_t hash_size;
   std::mutex lock;

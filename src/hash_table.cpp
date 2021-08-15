@@ -19,18 +19,18 @@ uint32_t calculateChecksum(HashEntry value)
 
 } // namespace
 
-HashTable::HashTable() :table(), hash_size(0), lock() {}
+HashTable::HashTable() : table(), hash_size(0), lock() {}
 
 void HashTable::clear()
 {
   lock.lock();
-  std::fill(std::execution::par_unseq, table.begin(), table.end(), HashEntry{0});
+  std::fill(std::execution::par_unseq, table.begin(), table.end(), HashEntry {0});
   lock.unlock();
 }
 
 void HashTable::resize(size_t new_size_mb)
 {
-  hash_size = previousPowerOfTwo(new_size_mb/sizeof(HashEntry));
+  hash_size = previousPowerOfTwo(new_size_mb / sizeof(HashEntry));
   lock.lock();
   table.resize(hash_size);
   lock.unlock();
@@ -44,16 +44,16 @@ void HashTable::stash(HashKey key, HashEntry value)
   table[key & mask] = value;
 }
 
-HashEntry HashTable::probe(HashKey key, bool &found) const
+HashEntry HashTable::probe(HashKey key, bool& found) const
 {
   HashKey mask = hash_size - 1;
   const HashEntry& value = table[key & mask];
-  if(key == value.key && value.checksum == calculateChecksum(value)) {
+  if (key == value.key && value.checksum == calculateChecksum(value)) {
     found = true;
     return value;
   }
   found = false;
-  return HashEntry{};
+  return HashEntry {};
 }
 
 } // namespace shepichess

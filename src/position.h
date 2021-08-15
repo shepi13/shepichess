@@ -37,7 +37,7 @@ struct PositionState {
 };
 
 class Position {
-  public:
+public:
   Position();
   ~Position();
   Position(const Position&) = delete;
@@ -45,7 +45,7 @@ class Position {
   Position& operator=(const Position&) = delete;
   Position& operator=(Position&&) = delete;
 
-  private:
+private:
   int move_number;
   Color side_to_move;
   Piece pieces[64];
