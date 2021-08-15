@@ -1,10 +1,8 @@
 #pragma once
 
-namespace shepichess
-{
+namespace shepichess {
 
 class Move {
-
 };
 
 } // namespace shepichess
