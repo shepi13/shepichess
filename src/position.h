@@ -3,8 +3,8 @@
 #include <vector>
 
 #include "bitboard.h"
-#include "move.h"
 #include "hash_table.h"
+#include "move.h"
 
 namespace shepichess {
 
@@ -23,10 +23,7 @@ enum class Piece {
   BlackKing
 };
 
-enum class Color {
-  White,
-  Black
-};
+enum class Color { White, Black };
 
 struct PositionState {
   bool white_kingside_castle;
@@ -40,7 +37,7 @@ struct PositionState {
 };
 
 class Position {
-public:
+  public:
   Position();
   ~Position();
   Position(const Position&) = delete;
@@ -48,7 +45,7 @@ public:
   Position& operator=(const Position&) = delete;
   Position& operator=(Position&&) = delete;
 
-private:
+  private:
   int move_number;
   Color side_to_move;
   Piece pieces[64];
@@ -56,6 +53,11 @@ private:
   Bitboard pieces_by_type[16];
   std::vector<PositionState> states;
   std::vector<Move> moves;
+  // Zobrist constants
+  static std::array<HashKey, 768> zobrist_pieces;
+  static std::array<HashKey, 4> zobrist_castling;
+  static std::array<HashKey, 8> zobrist_enpassant;
+  static HashKey zobrist_side_to_move;
 };
 
 } // namespace shepichess
