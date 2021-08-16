@@ -100,7 +100,7 @@ commands:
           name: "Run clang-tidy on changed files"
           command: >-
             git --no-pager diff --name-only $(git merge-base main HEAD) |
-            { grep -E '*.cpp' || test $? = 1; } |
+            { grep -E '*\.cpp' || test $? = 1; } |
             xargs -I{} clang-tidy {} -- -isystem bin/spdlog/include -Isrc --std=c++17
   clang_format:
     description: "Runs clang-format on changed files"
@@ -109,7 +109,7 @@ commands:
           name: "Run clang-format on changed files"
           command: >-
             git --no-pager diff --name-only $(git merge-base main HEAD) |
-            { grep -E '*.cpp|*.h' || test $? = 1; } |
+            { grep -E '*\.cpp|*\.h' || test $? = 1; } |
             xargs clang-format --dry-run --Werror
 
   fullbuild_linux:
