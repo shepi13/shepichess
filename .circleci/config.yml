@@ -37,7 +37,7 @@ commands:
   restore_third_party_cache:
     description: "Restores cache for 3rd party libraries and cmake files"
     steps:
-      - run: 
+      - restore_cache: 
           key: cmakecache-v2-{{checksum "CMakeLists.txt"}}-{{ arch }}
   save_third_party_cache:
     description: "Saves cache of cmake build files"
