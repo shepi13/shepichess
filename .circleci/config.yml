@@ -40,24 +40,30 @@ commands:
           name: "Calculate hash for 3rd party libs"
           command: >-
             echo $(git ls-tree HEAD third_party/spdlog | awk {'print $3'}) >.spdlog_hash;
-            echo $(git ls-tree HEAD third_party/Catch2 | awk {'print $3'}) >.catch2_hash
+            echo $(git ls-tree HEAD third_party/Catch2 | awk {'print $3'}) >.catch2_hash;
+            echo $(git ls-tree HEAD third_party/benchmark | awk {'print $3'}) >.benchmark_hash;
+            echo $(sha256sum CMakeLists.txt | awk {'print $1'}) >.cmake_hash;
       - restore_cache:
-          key: spdlogcache-v3-{{ checksum ".spdlog_hash" }}
+          key: spdlogcache-v1-{{checksum "CMakeLists.txt"}}-{{ checksum ".spdlog_hash" }}
       - restore_cache:
-          key: catch2cache-v4-{{ checksum ".catch2_hash" }} 
+          key: catch2cache-v1-{{checksum "CMakeLists.txt"}}-{{ checksum ".catch2_hash" }} 
+      - restore_cache:
+          key: benchmarkcache-v1-{{checksum "CMakeLists.txt"}}-{{checksum ".benchmark_hash"}}
   save_third_party_cache:
     description: "Saves cache for 3rd party libraries and cmake files"
     steps:
       - save_cache:
-          key: spdlogcache-v3-{{ checksum ".spdlog_hash" }}
+          key: spdlogcache-v1-{{checksum "CMakeLists.txt"}}-{{ checksum ".spdlog_hash" }}
           paths: 
-            - bin/spdlog
-            - build/spdlog
+            - build/third_party/spdlog
       - save_cache:
-          key: catch2cache-v4-{{ checksum ".catch2_hash" }}
+          key: catch2cache-v1-{{checksum "CMakeLists.txt"}}-{{ checksum ".catch2_hash" }} 
           paths:
-            - bin/Catch2
-            - build/Catch2
+            - build/third_party/Catch2
+      - save_cache:
+          key: benchmarkcache-v1-{{checksum "CMakeLists.txt"}}-{{checksum ".benchmark_hash"}}
+          paths:
+            - build/third_party/benchmark
 
   build:
     description: "Configures and builds project with cmake"

@@ -17,22 +17,7 @@ endif()
 include_directories("${PROJECT_SOURCE_DIR}/src")
 
 # Dependencies
-include(ExternalProject)
-ExternalProject_Add(
-    spdlog
-    PREFIX spdlog
-    SOURCE_DIR ${PROJECT_SOURCE_DIR}/third_party/spdlog
-    CMAKE_ARGS 
-    -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
-    -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
-    -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
-    -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}
-    -DSPDLOG_BUILD_SHARED=OFF
-    -DCMAKE_INSTALL_PREFIX=${PROJECT_SOURCE_DIR}/bin/spdlog
-)
-set(BENCHMARK_ENABLE_GTEST_TESTS OFF)
-set(BENCHMARK_ENABLE_TESTING OFF)
-add_subdirectory(third_party/benchmark)
+add_subdirectory(third_party/spdlog)
 
 # Build
 add_subdirectory(src)
@@ -42,17 +27,12 @@ target_link_libraries(shepichess PRIVATE engine)
 
 # Test
 if(BUILD_TESTING AND NOT_SUBPROJECT)
-    ExternalProject_Add(
-        Catch2
-        PREFIX Catch2
-        SOURCE_DIR ${PROJECT_SOURCE_DIR}/third_party/Catch2
-        CMAKE_ARGS 
-        -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
-        -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
-        -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
-        -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}
-        -DCMAKE_INSTALL_PREFIX=${PROJECT_SOURCE_DIR}/bin/Catch2
-    )
+    # Testing dependencies
+    set(BENCHMARK_ENABLE_GTEST_TESTS OFF)
+    set (BENCHMARK_ENABLE_TESTING OFF)
+    add_subdirectory(third_party/benchmark)
+    add_subdirectory(third_party/Catch2)
     list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/third_party/Catch2/extras)
+    # Tests
     add_subdirectory(tests)
 endif()
