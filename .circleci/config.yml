@@ -5,6 +5,7 @@ orbs:
   win: circleci/windows@2.4.0
 
 commands:
+  # Git checkout
   checkout_with_submodules:
     description: "Installs git submodules recursively"
     steps:
@@ -12,7 +13,7 @@ commands:
       - run: 
           name: "Install submodules"
           command: "git submodule update --init --recursive"
-
+  # Install libraries and programs
   install_cmake:
     description: "Installs CMake"
     parameters:
@@ -32,45 +33,20 @@ commands:
       - run:
           name: "Install TBB"
           command: "sudo apt install libtbb-dev"
-
+  # Caching
   restore_third_party_cache:
     description: "Restores cache for 3rd party libraries and cmake files"
     steps:
       - run: 
-          name: "Calculate hash for 3rd party libs"
-          command: >-
-            echo $(git ls-tree HEAD third_party/spdlog | awk {'print $3'}) >.spdlog_hash;
-            echo $(git ls-tree HEAD third_party/Catch2 | awk {'print $3'}) >.catch2_hash;
-            echo $(git ls-tree HEAD third_party/benchmark | awk {'print $3'}) >.benchmark_hash;
-            echo $(sha256sum CMakeLists.txt | awk {'print $1'}) >.cmake_hash;
-      - restore_cache:
-          key: spdlogcache-v1-{{checksum "CMakeLists.txt"}}-{{ checksum ".spdlog_hash" }}
-      - restore_cache:
-          key: catch2cache-v1-{{checksum "CMakeLists.txt"}}-{{ checksum ".catch2_hash" }} 
-      - restore_cache:
-          key: benchmarkcache-v1-{{checksum "CMakeLists.txt"}}-{{checksum ".benchmark_hash"}}
-      - restore_cache:
-          key: cmakecache-v1-{{checksum "CMakeLists.txt"}}-{{ arch }}
+          key: cmakecache-v2-{{checksum "CMakeLists.txt"}}-{{ arch }}
   save_third_party_cache:
-    description: "Saves cache for 3rd party libraries and cmake files"
+    description: "Saves cache of cmake build files"
     steps:
       - save_cache:
-          key: spdlogcache-v1-{{checksum "CMakeLists.txt"}}-{{ checksum ".spdlog_hash" }}
+          key: cmakecache-v2-{{checksum "CMakeLists.txt"}}-{{ arch }}
           paths: 
-            - build/third_party/spdlog
-      - save_cache:
-          key: catch2cache-v1-{{checksum "CMakeLists.txt"}}-{{ checksum ".catch2_hash" }} 
-          paths:
-            - build/third_party/Catch2
-      - save_cache:
-          key: benchmarkcache-v1-{{checksum "CMakeLists.txt"}}-{{checksum ".benchmark_hash"}}
-          paths:
-            - build/third_party/benchmark
-      - save_cache:
-          key: cmakecache-v1-{{checksum "CMakeLists.txt"}}-{{ arch }}
-          paths:
-            - build/CMakeCache.txt
-
+            - build
+  # Build/test
   build:
     description: "Configures and builds project with cmake"
     parameters:
@@ -104,7 +80,7 @@ commands:
             <<^ parameters.windows >> >testresults/testEngine.xml <</ parameters.windows >>
       - store_test_results:
           path: 'build/testresults'
-          
+  # Lint / Format
   clang_tidy:
     description: "Runs clang-tidy on changed files"
     steps:
@@ -123,7 +99,7 @@ commands:
             git --no-pager diff --name-only $(git merge-base main HEAD) |
             { grep -E '*\.cpp|*\.h' || test $? = 1; } |
             xargs clang-format --dry-run --Werror
-
+  # Full builds
   fullbuild_linux:
     description: "Full linux build with caching"
     steps:
@@ -145,6 +121,7 @@ commands:
           package_manager: "choco"
       - build
 
+# Jobs
 jobs:
   linux-gcc:
     docker:
@@ -184,7 +161,7 @@ jobs:
           name: "Install clang-format"
           command: "sudo apt-get update && sudo apt-get install clang-format"
       - clang_format
-
+# Workflows
 workflows:
   version: 2
   commit:
