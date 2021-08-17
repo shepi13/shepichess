@@ -49,6 +49,8 @@ commands:
           key: catch2cache-v1-{{checksum "CMakeLists.txt"}}-{{ checksum ".catch2_hash" }} 
       - restore_cache:
           key: benchmarkcache-v1-{{checksum "CMakeLists.txt"}}-{{checksum ".benchmark_hash"}}
+      - restore_cache:
+          key: cmakecache-v1-{{checksum "CMakeLists.txt"}}-{{ arch }}
   save_third_party_cache:
     description: "Saves cache for 3rd party libraries and cmake files"
     steps:
@@ -64,6 +66,10 @@ commands:
           key: benchmarkcache-v1-{{checksum "CMakeLists.txt"}}-{{checksum ".benchmark_hash"}}
           paths:
             - build/third_party/benchmark
+      - save_cache:
+          key: cmakecache-v1-{{checksum "CMakeLists.txt"}}-{{ arch }}
+          paths:
+            - build/CMakeCache.txt
 
   build:
     description: "Configures and builds project with cmake"
