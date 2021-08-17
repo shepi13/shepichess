@@ -33,19 +33,6 @@ commands:
       - run:
           name: "Install TBB"
           command: "sudo apt install libtbb-dev"
-  # Caching
-  restore_third_party_cache:
-    description: "Restores cache for 3rd party libraries and cmake files"
-    steps:
-      - restore_cache: 
-          key: cmakecache-v2-{{checksum "CMakeLists.txt"}}-{{ arch }}
-  save_third_party_cache:
-    description: "Saves cache of cmake build files"
-    steps:
-      - save_cache:
-          key: cmakecache-v2-{{checksum "CMakeLists.txt"}}-{{ arch }}
-          paths: 
-            - build
   # Build/test
   build:
     description: "Configures and builds project with cmake"
@@ -101,7 +88,7 @@ commands:
             xargs clang-format --dry-run --Werror
   # Full builds
   fullbuild_linux:
-    description: "Full linux build with caching"
+    description: "Full linux build"
     steps:
       - checkout_with_submodules
       - run: "sudo apt-get update"
@@ -109,9 +96,7 @@ commands:
           sudo: true
           package_manager: "apt-get"
       - install_tbb
-      - restore_third_party_cache
       - build
-      - save_third_party_cache
   fullbuild_windows:
     description: "Full windows build"
     steps:
@@ -120,7 +105,7 @@ commands:
           sudo: false
           package_manager: "choco"
       - build
-
+          windows: true
 # Jobs
 jobs:
   linux-gcc:
