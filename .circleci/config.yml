@@ -167,6 +167,7 @@ jobs:
       CC: gcc-9
       CXX: g++-9
     steps:
+      - checkout_with_submodules
       - run:
           name: "Install clang-tidy"
           command: "sudo apt-get update && sudo apt-get install clang-tidy" 
