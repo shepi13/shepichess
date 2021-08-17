@@ -104,7 +104,7 @@ commands:
       - install_cmake:
           sudo: false
           package_manager: "choco"
-      - build
+      - build:
           windows: true
 # Jobs
 jobs:
