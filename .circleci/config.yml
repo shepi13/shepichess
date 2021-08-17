@@ -113,7 +113,7 @@ commands:
           command: >-
             git --no-pager diff --name-only $(git merge-base main HEAD) |
             { grep -E '*\.cpp' || test $? = 1; } |
-            xargs -I{} clang-tidy {} -- -isystem bin/spdlog/include -Isrc --std=c++17
+            xargs -I{} clang-tidy {} -- -isystem third_party/spdlog/include -Isrc --std=c++17
   clang_format:
     description: "Runs clang-format on changed files"
     steps:
@@ -167,7 +167,6 @@ jobs:
       CC: gcc-9
       CXX: g++-9
     steps:
-      - fullbuild_linux
       - run:
           name: "Install clang-tidy"
           command: "sudo apt-get update && sudo apt-get install clang-tidy" 
@@ -195,6 +194,7 @@ workflows:
   nightly:
     jobs:
       - linux-gcc
+      - windows
     triggers:
       - schedule:
           cron: "0 0 * * *"
