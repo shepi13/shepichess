@@ -12,9 +12,8 @@ add_dependencies(engineTests engine)
 target_link_libraries(engineTests PRIVATE engine)
 
 add_dependencies(engineTests Catch2)
-target_include_directories(engineTests PUBLIC ${PROJECT_SOURCE_DIR}/bin/Catch2/include)
-target_link_libraries(engineTests PRIVATE ${PROJECT_SOURCE_DIR}/bin/Catch2/lib/${CMAKE_STATIC_LIBRARY_PREFIX}Catch2Main${CMAKE_STATIC_LIBRARY_SUFFIX})
-target_link_libraries(engineTests PRIVATE ${PROJECT_SOURCE_DIR}/bin/Catch2/lib/${CMAKE_STATIC_LIBRARY_PREFIX}Catch2${CMAKE_STATIC_LIBRARY_SUFFIX})
+target_include_directories(engineTests PUBLIC ${PROJECT_SOURCE_DIR}/third_party/Catch2/src)
+target_link_libraries(engineTests PRIVATE Catch2::Catch2WithMain)
 
 include(Catch)
 catch_discover_tests(engineTests)

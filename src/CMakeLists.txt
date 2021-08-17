@@ -14,12 +14,12 @@ target_compile_features(engine PRIVATE cxx_std_17)
 
 # spdlog
 add_dependencies(engine spdlog)
-target_include_directories(engine PUBLIC ${PROJECT_SOURCE_DIR}/bin/spdlog/include)
+target_include_directories(engine PUBLIC ${PROJECT_SOURCE_DIR}/third_party/spdlog/include)
 target_link_libraries(engine PRIVATE tbb)
 if(WIN32)
-target_link_libraries(engine PRIVATE ${PROJECT_SOURCE_DIR}/bin/spdlog/lib/${CMAKE_STATIC_LIBRARY_PREFIX}spdlogd${CMAKE_STATIC_LIBRARY_SUFFIX})
+target_link_libraries(engine PRIVATE ${PROJECT_SOURCE_DIR}/build/third_party/spdlog/spdlogd.lib)
 else()
-target_link_libraries(engine PRIVATE ${PROJECT_SOURCE_DIR}/bin/spdlog/lib/${CMAKE_STATIC_LIBRARY_PREFIX}spdlog${CMAKE_STATIC_LIBRARY_SUFFIX})
+target_link_libraries(engine PRIVATE ${PROJECT_SOURCE_DIR}/build/third_party/spdlog/libspdlog.a)
 endif()
 
 # source group
