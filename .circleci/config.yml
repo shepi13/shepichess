@@ -47,7 +47,7 @@ commands:
             <<# parameters.windows >> $Env:Path+=";$Env:ProgramFiles\CMake\bin"; <</ parameters.windows >>
             cmake . -Bbuild;
             cd build;
-            cmake --build .
+            cmake --build . -j30
   test:
     description: "Tests and stores results"
     parameters:
