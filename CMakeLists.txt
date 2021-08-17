@@ -30,6 +30,9 @@ ExternalProject_Add(
     -DSPDLOG_BUILD_SHARED=OFF
     -DCMAKE_INSTALL_PREFIX=${PROJECT_SOURCE_DIR}/bin/spdlog
 )
+set(BENCHMARK_ENABLE_GTEST_TESTS OFF)
+set(BENCHMARK_ENABLE_TESTING OFF)
+add_subdirectory(third_party/benchmark)
 
 # Build
 add_subdirectory(src)
