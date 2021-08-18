@@ -15,11 +15,9 @@ target_compile_features(engine PRIVATE cxx_std_17)
 # spdlog
 add_dependencies(engine spdlog)
 target_include_directories(engine PUBLIC ${PROJECT_SOURCE_DIR}/third_party/spdlog/include)
-if(WIN32)
-target_link_libraries(engine PRIVATE ${PROJECT_SOURCE_DIR}/build/third_party/spdlog/spdlogd.lib)
-else()
-target_link_libraries(engine PRIVATE ${PROJECT_SOURCE_DIR}/build/third_party/spdlog/libspdlog.a)
-target_link_libraries(engine PRIVATE tbb)
+target_link_libraries(engine PRIVATE spdlog::spdlog)
+if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
+    target_link_libraries(engine PRIVATE tbb)
 endif()
 
 # source group
