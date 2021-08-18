@@ -38,8 +38,8 @@ struct PositionState {
 
 class Position {
 public:
-  Position();
-  ~Position();
+  Position() = default;
+  ~Position() = default;
   Position(const Position&) = delete;
   Position(const Position&&) = delete;
   Position& operator=(const Position&) = delete;
