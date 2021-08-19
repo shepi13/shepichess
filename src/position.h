@@ -39,7 +39,7 @@ struct PositionState {
 
 class Position {
 public:
-  Position();
+  Position() = default;
   ~Position() = default;
   Position(const Position&) = delete;
   Position(const Position&&) = delete;
@@ -49,9 +49,9 @@ public:
 private:
   int move_number = 0;
   Color side_to_move = Color::White;
-  std::array<Piece, 64> pieces;
-  std::array<Bitboard, 2> pieces_by_color;
-  std::array<Bitboard, 16> pieces_by_type;
+  std::array<Piece, 64> pieces {};
+  std::array<Bitboard, 2> pieces_by_color {};
+  std::array<Bitboard, 16> pieces_by_type {};
   std::vector<PositionState> states;
   std::vector<Move> moves;
   // Zobrist constants
