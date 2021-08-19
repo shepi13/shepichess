@@ -122,7 +122,7 @@ jobs:
     executor: win/default
     steps:
       - fullbuild_windows
-      - test
+      - test:
           windows: true
   lint:
     docker:
