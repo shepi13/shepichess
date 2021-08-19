@@ -3,6 +3,7 @@
 #include <array>
 #include <cstdint>
 #include <mutex>
+#include <optional>
 #include <vector>
 
 #include "move.h"
@@ -39,8 +40,7 @@ public:
   void clear();
   void resize(size_t new_size_mb);
   void stash(HashEntry value);
-  HashEntry probe(HashKey key, bool& found) const;
-
+  [[nodiscard]] std::optional<HashEntry> probe(HashKey key) const;
   [[nodiscard]] size_t size() const;
 
 private:

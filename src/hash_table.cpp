@@ -75,16 +75,15 @@ size_t HashTable::size() const
 void HashTable::stash(HashEntry value)
 {
   HashKey mask = hash_size - 1;
-  value.checksum = value.calculateChecksum();
   table[value.key & mask] = value;
 }
 
-HashEntry HashTable::probe(HashKey key, bool& found) const
+std::optional<HashEntry> HashTable::probe(HashKey key) const
 {
   HashKey mask = hash_size - 1;
   HashEntry value = table[key & mask];
-  found = (key == value.key && value.checksum == value.calculateChecksum());
-  return value;
+  bool found = (key == value.key && value.checksum == value.calculateChecksum());
+  return found ? std::optional<HashEntry> {value} : std::nullopt;
 }
 
 } // namespace shepichess

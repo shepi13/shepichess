@@ -20,10 +20,9 @@ static void BM_HashTableProbe(benchmark::State& state)
   shepichess::HashTable tt(state.range(0));
   shepichess::HashEntry entry {5, 100, 0x60, 0xff};
   tt.stash(entry);
-  bool found;
   for (auto _ : state) {
     (void)_;
-    benchmark::DoNotOptimize(tt.probe(0xff, found));
+    benchmark::DoNotOptimize(tt.probe(0xff));
   }
 }
 
