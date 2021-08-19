@@ -60,11 +60,12 @@ commands:
           command: >-
             cd build; 
             mkdir testresults; 
-            tests/engineTests -r junit           
             <<# parameters.windows >> 
-              | Out-File -FilePath testresults\testEngine.xml -Encoding ASCII 
+             tests/Debug/engineTests.exe | Out-File -FilePath testresults\testEngine.xml -Encoding ASCII 
             <</ parameters.windows >>
-            <<^ parameters.windows >> >testresults/testEngine.xml <</ parameters.windows >>
+            <<^ parameters.windows >> 
+            tests/engineTests -r junit >testresults/testEngine.xml 
+            <</ parameters.windows >>
       - store_test_results:
           path: 'build/testresults'
   # Lint / Format
