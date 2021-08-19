@@ -33,12 +33,12 @@ uint16_t HashEntry::depth() const
 
 uint16_t HashEntry::eval() const
 {
-  return static_cast<uint16_t>((data >> 16));
+  return static_cast<uint16_t>(data >> 16);
 }
 
 uint16_t HashEntry::bestMove() const
 {
-  return static_cast<uint16_t>((data >> 32));
+  return static_cast<uint16_t>(data >> 32);
 }
 
 HashKey HashEntry::calculateChecksum()
@@ -60,7 +60,7 @@ void HashTable::clear()
 
 void HashTable::resize(size_t new_size_mb)
 {
-  hash_size = previousPowerOfTwo(new_size_mb / sizeof(HashEntry));
+  hash_size = previousPowerOfTwo(new_size_mb * 1024 * 1024 / sizeof(HashEntry));
   lock.lock();
   table.resize(hash_size);
   lock.unlock();

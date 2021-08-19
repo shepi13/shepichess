@@ -29,7 +29,6 @@ private:
 
 class HashTable {
 public:
-  HashTable() = default;
   HashTable(size_t size);
   ~HashTable() = default;
   HashTable(const HashTable&) = delete;

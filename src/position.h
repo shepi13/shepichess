@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <vector>
 
 #include "bitboard.h"
@@ -32,13 +33,13 @@ struct PositionState {
   bool black_queenside_castle;
   uint16_t move_count50;
   uint16_t enpassant_square;
-  uint16_t material[2];
+  std::array<uint16_t, 2> material;
   HashKey zobrist;
 };
 
 class Position {
 public:
-  Position() = default;
+  Position();
   ~Position() = default;
   Position(const Position&) = delete;
   Position(const Position&&) = delete;
@@ -46,11 +47,11 @@ public:
   Position& operator=(Position&&) = delete;
 
 private:
-  int move_number;
-  Color side_to_move;
-  Piece pieces[64];
-  Bitboard pieces_by_color[2];
-  Bitboard pieces_by_type[16];
+  int move_number = 0;
+  Color side_to_move = Color::White;
+  std::array<Piece, 64> pieces;
+  std::array<Bitboard, 2> pieces_by_color;
+  std::array<Bitboard, 16> pieces_by_type;
   std::vector<PositionState> states;
   std::vector<Move> moves;
   // Zobrist constants
