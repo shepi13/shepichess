@@ -10,7 +10,7 @@ namespace {
 size_t previousPowerOfTwo(size_t val)
 {
   size_t result = 1;
-  while(result*2 <= val) {
+  while (result * 2 <= val) {
     result *= 2;
   }
   return result;
@@ -18,40 +18,35 @@ size_t previousPowerOfTwo(size_t val)
 
 } // namespace
 
-HashKey HashEntry::calculateChecksum()
-{
-  return data ^ key;
-}
-
-HashEntry::HashEntry() :data(0), checksum(0), key(0) {}
-
 HashEntry::HashEntry(uint16_t depth, uint16_t eval, uint16_t best_move, HashKey key)
-  :key(key)
+  : key(key)
 {
-  data = static_cast<HashKey>(depth);
-  data |= static_cast<HashKey>(eval << 16);
-  data |= static_cast<HashKey>(best_move << 32);
+  data = static_cast<HashKey>(depth) | static_cast<HashKey>(eval) << 16 |
+    static_cast<HashKey>(best_move) << 32;
   checksum = calculateChecksum();
 }
 
 uint16_t HashEntry::depth() const
 {
-  return static_cast<uint16_t>(data & 0xffff);
+  return static_cast<uint16_t>(data);
 }
 
 uint16_t HashEntry::eval() const
 {
-  return static_cast<uint16_t>((data >> 16) & 0xffff);
+  return static_cast<uint16_t>((data >> 16));
 }
 
 uint16_t HashEntry::bestMove() const
 {
-  return static_cast<uint16_t>((data >> 32) & 0xffff);
+  return static_cast<uint16_t>((data >> 32));
 }
 
-HashTable::HashTable() : table(), hash_size(0), lock() {}
+HashKey HashEntry::calculateChecksum()
+{
+  return data ^ key;
+}
 
-HashTable::HashTable(size_t size) : table(), hash_size(0), lock()
+HashTable::HashTable(size_t size)
 {
   resize(size);
 }

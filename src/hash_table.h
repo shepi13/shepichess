@@ -13,39 +13,40 @@ using HashKey = uint64_t;
 
 class HashEntry {
 public:
-  HashEntry();
+  HashEntry() = default;
   HashEntry(uint16_t depth, uint16_t eval, uint16_t best_move, HashKey key);
-  uint16_t depth() const;
-  uint16_t eval() const;
-  uint16_t bestMove() const;
+  [[nodiscard]] uint16_t depth() const;
+  [[nodiscard]] uint16_t eval() const;
+  [[nodiscard]] uint16_t bestMove() const;
+
 private:
   friend class HashTable;
   HashKey calculateChecksum();
-  HashKey data;
-  HashKey key;
-  HashKey checksum;
+  HashKey data = 0;
+  HashKey key = 0;
+  HashKey checksum = 0;
 };
 
 class HashTable {
 public:
-  HashTable();
+  HashTable() = default;
   HashTable(size_t size);
   ~HashTable() = default;
   HashTable(const HashTable&) = delete;
   HashTable& operator=(const HashTable&) = delete;
-
-  HashTable(HashTable&&) = default;
-  HashTable& operator=(HashTable&&) = default;
+  HashTable(HashTable&&) = delete;
+  HashTable& operator=(HashTable&&) = delete;
 
   void clear();
   void resize(size_t new_size_mb);
   void stash(HashEntry value);
   HashEntry probe(HashKey key, bool& found) const;
-  
-  size_t size() const;
+
+  [[nodiscard]] size_t size() const;
+
 private:
+  size_t hash_size = 0;
   std::vector<HashEntry> table;
-  size_t hash_size;
   std::mutex lock;
 };
 
