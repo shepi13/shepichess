@@ -133,6 +133,7 @@ jobs:
       - run:
           name: "Install clang-tidy"
           command: "sudo apt-get update && sudo apt-get install clang-tidy" 
+      - install_tbb
       - clang_tidy
   format:
     docker:
