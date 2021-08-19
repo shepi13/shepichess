@@ -123,6 +123,7 @@ jobs:
     steps:
       - fullbuild_windows
       - test
+          windows: true
   lint:
     docker:
       - image: cimg/base:2021.04
