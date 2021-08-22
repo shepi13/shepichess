@@ -35,4 +35,5 @@ if(BUILD_TESTING AND NOT_SUBPROJECT)
     list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/third_party/Catch2/extras)
     # Tests
     add_subdirectory(tests)
+    add_subdirectory(benchmark)
 endif()

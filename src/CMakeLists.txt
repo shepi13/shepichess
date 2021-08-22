@@ -1,7 +1,7 @@
 add_library(engine)
 
-set(SourceFiles bitboard.cpp uci_application.cpp uci_config.cpp)
-set(HeaderFiles bitboard.h uci_application.h logging.h position.h)
+set(SourceFiles bitboard.cpp uci_application.cpp uci_config.cpp hash_table.cpp)
+set(HeaderFiles bitboard.h uci_application.h logging.h position.h hash_table.h uci_config.h)
 
 target_sources( 
     engine

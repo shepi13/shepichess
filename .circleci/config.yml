@@ -77,7 +77,8 @@ commands:
           command: >-
             git --no-pager diff --name-only $(git merge-base main HEAD) |
             { grep -E '*\.cpp' || test $? = 1; } |
-            xargs -I{} clang-tidy {} -- -isystem third_party/spdlog/include -Isrc --std=c++17
+            xargs -I{} clang-tidy {} -- -isystem third_party/spdlog/include 
+            -isystem third_party/Catch2/src -isystem third_party/benchmark/include -Isrc --std=c++17
   clang_format:
     description: "Runs clang-format on changed files"
     steps:
@@ -135,6 +136,7 @@ jobs:
       - run:
           name: "Install clang-tidy"
           command: "sudo apt-get update && sudo apt-get install clang-tidy" 
+      - install_tbb
       - clang_tidy
   format:
     docker:

@@ -12,7 +12,7 @@ const inline std::string kEngineName {"shepichess"};
 const inline std::string kEngineAuthor {"shepi13"};
 
 class UCIApp {
-  public:
+public:
   UCIApp(std::istream& = std::cin, std::ostream& = std::cout);
   ~UCIApp() = default;
 
@@ -23,7 +23,7 @@ class UCIApp {
 
   void mainLoop();
 
-  private:
+private:
   Position position;
   UCIConfig config;
   bool uciDebugMode = false;
