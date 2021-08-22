@@ -8,11 +8,9 @@ static void BM_HashTableStash(benchmark::State& state)
 {
   shepichess::HashTable tt(state.range(0));
   shepichess::HashEntry entry {5, 100, 0x60, 0xff};
-  for (auto _ : state) {
-    (void)_;
+  for ([[maybe_unused]] auto _ : state) {
     tt.stash(entry);
   }
-  benchmark::DoNotOptimize(tt);
 }
 
 static void BM_HashTableProbe(benchmark::State& state)
@@ -20,8 +18,7 @@ static void BM_HashTableProbe(benchmark::State& state)
   shepichess::HashTable tt(state.range(0));
   shepichess::HashEntry entry {5, 100, 0x60, 0xff};
   tt.stash(entry);
-  for (auto _ : state) {
-    (void)_;
+  for ([[maybe_unused]] auto _ : state) {
     benchmark::DoNotOptimize(tt.probe(0xff));
   }
 }

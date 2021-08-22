@@ -53,17 +53,15 @@ HashTable::HashTable(size_t size)
 
 void HashTable::clear()
 {
-  lock.lock();
+  std::scoped_lock clear_lock(lock);
   std::fill(std::execution::par_unseq, table.begin(), table.end(), HashEntry {});
-  lock.unlock();
 }
 
 void HashTable::resize(size_t new_size_mb)
 {
   hash_size = previousPowerOfTwo(new_size_mb * 1024 * 1024 / sizeof(HashEntry));
-  lock.lock();
+  std::scoped_lock resize_lock(lock);
   table.resize(hash_size);
-  lock.unlock();
 }
 
 size_t HashTable::size() const
