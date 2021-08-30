@@ -2,11 +2,10 @@
 
 #include <array>
 #include <execution>
-#include <mutex>
 #include <random>
 #include <sstream>
 
-#include "logging.h"
+#include <spdlog/spdlog.h>
 
 namespace shepichess {
 
@@ -163,24 +162,20 @@ static std::array<MagicData, 64> rookMap;
 static std::array<MagicData, 64> bishopMap;
 static std::array<Bitboard, 64> knightMap;
 static std::array<Bitboard, 64> kingMap;
-static std::once_flag bitboards_init_flag;
 
-void bitboards::init()
+void initBitboards()
 {
   using std::execution::par_unseq;
-  initLogging();
-  std::call_once(bitboards_init_flag, []() {
-    SPDLOG_INFO("Initializing Bitboards");
-    std::array<int, 64> sq {0};
-    std::iota(sq.begin(), sq.end(), 0);
-    auto genRookMap = [](auto&& square) { return generateMagic(square, true); };
-    auto genBishopMap = [](auto&& square) { return generateMagic(square, false); };
-    std::transform(par_unseq, sq.begin(), sq.end(), kingMap.begin(), genKingMap);
-    std::transform(par_unseq, sq.begin(), sq.end(), knightMap.begin(), genKnightMap);
-    std::transform(par_unseq, sq.begin(), sq.end(), rookMap.begin(), genRookMap);
-    std::transform(par_unseq, sq.begin(), sq.end(), bishopMap.begin(), genBishopMap);
-    SPDLOG_INFO("Bitboards successfully initialized");
-  });
+  SPDLOG_INFO("Initializing Bitboards");
+  std::array<int, 64> sq {0};
+  std::iota(sq.begin(), sq.end(), 0);
+  auto genRookMap = [](auto&& square) { return generateMagic(square, true); };
+  auto genBishopMap = [](auto&& square) { return generateMagic(square, false); };
+  std::transform(par_unseq, sq.begin(), sq.end(), kingMap.begin(), genKingMap);
+  std::transform(par_unseq, sq.begin(), sq.end(), knightMap.begin(), genKnightMap);
+  std::transform(par_unseq, sq.begin(), sq.end(), rookMap.begin(), genRookMap);
+  std::transform(par_unseq, sq.begin(), sq.end(), bishopMap.begin(), genBishopMap);
+  SPDLOG_INFO("Bitboards successfully initialized");
 }
 
 Bitboard attack_maps::knightAttacks(unsigned int square)

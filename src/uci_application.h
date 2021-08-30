@@ -3,6 +3,9 @@
 #include <iostream>
 #include <string>
 
+#include <spdlog/sinks/stdout_color_sinks.h>
+#include <spdlog/spdlog.h>
+
 #include "position.h"
 #include "uci_config.h"
 
@@ -13,7 +16,7 @@ const inline std::string kEngineAuthor {"shepi13"};
 
 class UCIApp {
 public:
-  UCIApp(std::istream& = std::cin, std::ostream& = std::cout);
+  UCIApp(std::istream& in = std::cin, std::ostream& out = std::cout);
   ~UCIApp() = default;
 
   UCIApp(const UCIApp&) = delete;
@@ -22,6 +25,7 @@ public:
   UCIApp& operator=(UCIApp&&) = delete;
 
   void mainLoop();
+  static void init();
 
 private:
   Position position;

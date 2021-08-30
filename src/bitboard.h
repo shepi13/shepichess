@@ -17,6 +17,8 @@ namespace shepichess {
 
 using Bitboard = std::uint64_t;
 
+void initBitboards();
+
 enum class Direction {
   North,
   East,
@@ -45,7 +47,6 @@ constexpr Bitboard kBoardEdge = kFileA | kFileH | kRank1 | kRank8;
 
 namespace bitboards {
 
-void init();
 std::string repr(Bitboard);
 
 constexpr Bitboard fromSquare(unsigned int);

@@ -2,6 +2,8 @@
 
 #include <catch2/catch_test_macros.hpp>
 
+#include "uci_application.h"
+
 using shepichess::Bitboard, shepichess::Direction;
 
 TEST_CASE("bitboards::getbit", "[bitboard]")
@@ -110,7 +112,7 @@ TEST_CASE("bitboards::shift edge", "[bitboard]")
 TEST_CASE("attack_maps::knightAttacks", "[bitboard, attack_maps]")
 {
   using shepichess::attack_maps::knightAttacks;
-  shepichess::bitboards::init();
+  shepichess::UCIApp::init();
   REQUIRE(knightAttacks(27) == 0x00'00'14'22'00'22'14'00); // e4
   REQUIRE(knightAttacks(11) == 0x00'00'00'00'14'22'00'22); // e2
   REQUIRE(knightAttacks(51) == 0x22'00'22'14'00'00'00'00); // e7
@@ -121,7 +123,7 @@ TEST_CASE("attack_maps::knightAttacks", "[bitboard, attack_maps]")
 TEST_CASE("attack_maps::kingAttacks", "[bitboard, attack_maps]")
 {
   using shepichess::attack_maps::kingAttacks;
-  shepichess::bitboards::init();
+  shepichess::UCIApp::init();
   REQUIRE(kingAttacks(27) == 0x00'00'00'1c'14'1c'00'00);
   REQUIRE(kingAttacks(3) == 0x00'00'00'00'00'00'1c'14);
   REQUIRE(kingAttacks(59) == 0x14'1c'00'00'00'00'00'00);
@@ -132,7 +134,7 @@ TEST_CASE("attack_maps::kingAttacks", "[bitboard, attack_maps]")
 TEST_CASE("attack_maps::bishopAttacks", "[bitboard, attack_maps]")
 {
   using shepichess::attack_maps::bishopAttacks;
-  shepichess::bitboards::init();
+  shepichess::UCIApp::init();
   Bitboard blockers = 0xff'ff'ff'00'00'00'ff'ff;
   REQUIRE(bishopAttacks(27, 0) == 0x80'41'22'14'00'14'22'41);
   REQUIRE(bishopAttacks(27, blockers) == 0x00'00'22'14'00'14'22'00);
@@ -141,7 +143,7 @@ TEST_CASE("attack_maps::bishopAttacks", "[bitboard, attack_maps]")
 TEST_CASE("attack_maps::rookAttacks", "[bitboard, attack_maps]")
 {
   using shepichess::attack_maps::rookAttacks;
-  shepichess::bitboards::init();
+  shepichess::UCIApp::init();
   Bitboard blockers = 0xff'ff'c3'c3'c3'c3'ff'ff;
   REQUIRE(rookAttacks(27, 0) == 0x08'08'08'08'f7'08'08'08);
   REQUIRE(rookAttacks(27, blockers) == 0x00'08'08'08'76'08'08'00);
@@ -150,7 +152,7 @@ TEST_CASE("attack_maps::rookAttacks", "[bitboard, attack_maps]")
 TEST_CASE("attack_maps::queenAttacks", "[bitboard, attack_maps]")
 {
   using shepichess::attack_maps::queenAttacks;
-  shepichess::bitboards::init();
+  shepichess::UCIApp::init();
   Bitboard blockers = 0xff'ff'c3'c3'c3'c3'ff'ff;
   REQUIRE(queenAttacks(27, 0) == 0x88'49'2a'1c'f7'1c'2a'49);
   REQUIRE(queenAttacks(27, blockers) == 0x00'48'2a'1c'76'1c'2a'00);

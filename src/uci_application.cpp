@@ -1,26 +1,55 @@
 #include "uci_application.h"
 
 #include <iostream>
+#include <mutex>
 #include <regex>
 #include <sstream>
 #include <string>
 
+#include <spdlog/spdlog.h>
+
 #include "bitboard.h"
-#include "logging.h"
 
 namespace shepichess {
+
+namespace {
+
+const std::string kWhiteSpace = " \t\n\r\f\v";
+std::string trim(std::string str, const std::string& trim_chars = kWhiteSpace)
+{
+  str.erase(str.find_last_not_of(trim_chars) + 1);
+  str.erase(0, str.find_first_not_of(trim_chars));
+  return str;
+}
+
+void initLogging()
+{
+  auto&& stderr_logger = spdlog::stderr_color_mt("shepichess_stderr_logger");
+  stderr_logger->set_level(spdlog::level::trace);
+  spdlog::set_level(spdlog::level::trace);
+  spdlog::set_default_logger(stderr_logger);
+  spdlog::set_pattern("[%Y-%m-%d %H:%M:%S] [thread %t] [%^%l%$] [%s:%#] %v");
+  SPDLOG_INFO("Created logger with level: {}", SPDLOG_ACTIVE_LEVEL);
+}
+
+} // namespace
 
 struct UCIApp::UCICommand {
   std::string command;
   std::string args;
 };
 
-UCIApp::UCIApp(std::istream& in, std::ostream& out)
-  : position(), config(), in(in), out(out)
+void UCIApp::init()
 {
-  initLogging();
-  bitboards::init();
+  static std::once_flag init_flag;
+  std::call_once(init_flag, []() {
+    initLogging();
+    initBitboards();
+    initZobrist();
+  });
 }
+
+UCIApp::UCIApp(std::istream& in, std::ostream& out) : in(in), out(out) {}
 
 void UCIApp::mainLoop()
 {
@@ -117,8 +146,15 @@ void UCIApp::setOption(const std::string& args)
   config.setOption(name, value);
 }
 
-// TODO: depends on position.h
-void UCIApp::setPosition(const std::string& args) {}
+void UCIApp::setPosition(const std::string& args)
+{
+  std::string fen = trim(args.substr(0, args.find("moves")));
+  if (fen == "startpos") {
+    fen = kStartPositionFen;
+  }
+  SPDLOG_INFO("Found fen {}", fen);
+  position.setPosition(fen);
+}
 
 // TODO: depends on search implementation
 void UCIApp::startCalculation(const std::string& args) {}

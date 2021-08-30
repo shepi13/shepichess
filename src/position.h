@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <string>
 #include <vector>
 
 #include "bitboard.h"
@@ -9,6 +10,13 @@
 
 namespace shepichess {
 
+void initZobrist();
+
+const std::string kStartPositionFen {
+  "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"};
+
+enum class Color { White, Black };
+
 enum class Piece {
   WhitePawn = 0,
   WhiteRook,
@@ -16,15 +24,14 @@ enum class Piece {
   WhiteBishop,
   WhiteQueen,
   WhiteKing,
-  BlackPawn = 8,
+  BlackPawn,
   BlackRook,
   BlackKnight,
   BlackBishop,
   BlackQueen,
-  BlackKing
+  BlackKing,
+  None
 };
-
-enum class Color { White, Black };
 
 struct PositionState {
   bool white_kingside_castle;
@@ -39,12 +46,18 @@ struct PositionState {
 
 class Position {
 public:
-  Position() = default;
+  Position(const std::string& fen = kStartPositionFen);
   ~Position() = default;
   Position(const Position&) = delete;
   Position(const Position&&) = delete;
   Position& operator=(const Position&) = delete;
   Position& operator=(Position&&) = delete;
+
+  void setPosition(const std::string& fen = kStartPositionFen);
+  [[nodiscard]] std::string repr();
+
+  // For debugging
+  [[nodiscard]] bool checkInvariants();
 
 private:
   int move_number = 0;
@@ -52,13 +65,11 @@ private:
   std::array<Piece, 64> pieces {};
   std::array<Bitboard, 2> pieces_by_color {};
   std::array<Bitboard, 16> pieces_by_type {};
-  std::vector<PositionState> states;
-  std::vector<Move> moves;
-  // Zobrist constants
-  static std::array<HashKey, 768> zobrist_pieces;
-  static std::array<HashKey, 4> zobrist_castling;
-  static std::array<HashKey, 8> zobrist_enpassant;
-  static HashKey zobrist_side_to_move;
+  std::vector<PositionState> states {};
+  std::vector<Move> moves {};
+
+  void resetPosition();
+  void initPosition(const std::string& fen);
 };
 
 } // namespace shepichess
