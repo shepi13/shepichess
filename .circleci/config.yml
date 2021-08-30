@@ -77,7 +77,7 @@ commands:
           command: >-
             git --no-pager diff --name-only $(git merge-base main HEAD) |
             { grep -E '*\.cpp' || test $? = 1; } |
-            xargs -n 1 ls -d 2>/dev/null |
+            { xargs -n 1 ls -d 2>/dev/null || true; } |
             xargs -I{} clang-tidy {} -- -isystem third_party/spdlog/include 
             -isystem third_party/Catch2/src -isystem third_party/benchmark/include -Isrc --std=c++17
   clang_format:
@@ -88,7 +88,7 @@ commands:
           command: >-
             git --no-pager diff --name-only $(git merge-base main HEAD) |
             { grep -E '*\.cpp|*\.h' || test $? = 1; } |
-            xargs -n 1 ls -d 2>/dev/null |
+            { xargs -n 1 ls -d 2>/dev/null || true; } |
             xargs clang-format --dry-run --Werror
   # Full builds
   fullbuild_linux:
