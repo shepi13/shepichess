@@ -225,7 +225,7 @@ HashKey Position::zobrist() const
   return states.back().zobrist;
 }
 
-Piece Position::getPiece(int square) const 
+Piece Position::getPiece(int square) const
 {
   return pieces[square];
 }

@@ -60,7 +60,7 @@ TEST_CASE("position::setPosition enPassant file", "[position, fen]")
   REQUIRE(position.enpassantFile() == 'e');
 }
 
-TEST_CASE("position::setPosition pieces", "[position, fen]") 
+TEST_CASE("position::setPosition pieces", "[position, fen]")
 {
   UCIApp::init();
   Position position;
@@ -75,7 +75,7 @@ TEST_CASE("position::setPosition pieces", "[position, fen]")
   expected_pieces[56] = Piece::WhiteKing;
   REQUIRE(position.colorBitboard(Color::White) == 0x01'00'20'00'00'00'00'00);
   REQUIRE(position.colorBitboard(Color::Black) == 0x00'00'80'01'00'00'00'00);
-  for(int i = 0; i < 64; i++) {
+  for (int i = 0; i < 64; i++) {
     SPDLOG_TRACE("Checking piece on square {}", i);
     REQUIRE(position.getPiece(i) == expected_pieces[i]);
   }
