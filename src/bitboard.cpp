@@ -5,7 +5,7 @@
 #include <random>
 #include <sstream>
 
-#include <spdlog/spdlog.h>
+#include "logging.h"
 
 namespace shepichess {
 
@@ -103,7 +103,7 @@ MagicData generateMagic(int square, bool rook)
   // Generate all blocker/attack combinations
   std::array<Bitboard, kAttackMapSize> attacks {0}, blockers {0};
   Bitboard mask = generateMask(square, rook);
-  SPDLOG_DEBUG("Generated mask for ({}, {}):\n{}", square, rook, repr(mask));
+  SPDLOG_TRACE("Generated mask:\n{}", repr(mask));
   int shift = bitboards::popcount(mask);
   for (int i = 0; i < (1 << shift); i++) {
     blockers[i] = generateBlockerPermutations(i, mask);
@@ -126,7 +126,12 @@ MagicData generateMagic(int square, bool rook)
       }
     }
     if (success) {
-      SPDLOG_DEBUG("Generated Magic Data with shift={}, constant={}", shift, constant);
+      SPDLOG_DEBUG(
+        "Generated Magic Data with shift={}, constant={}, for ({}, {})",
+        shift,
+        constant,
+        square,
+        rook);
       return MagicData {shift, mask, constant, magic_attacks};
     }
   }

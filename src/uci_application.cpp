@@ -6,9 +6,8 @@
 #include <sstream>
 #include <string>
 
-#include <spdlog/spdlog.h>
-
 #include "bitboard.h"
+#include "logging.h"
 
 namespace shepichess {
 
@@ -20,16 +19,6 @@ std::string trim(std::string str, const std::string& trim_chars = kWhiteSpace)
   str.erase(str.find_last_not_of(trim_chars) + 1);
   str.erase(0, str.find_first_not_of(trim_chars));
   return str;
-}
-
-void initLogging()
-{
-  auto&& stderr_logger = spdlog::stderr_color_mt("shepichess_stderr_logger");
-  stderr_logger->set_level(spdlog::level::trace);
-  spdlog::set_level(spdlog::level::trace);
-  spdlog::set_default_logger(stderr_logger);
-  spdlog::set_pattern("[%Y-%m-%d %H:%M:%S] [thread %t] [%^%l%$] [%s:%#] %v");
-  SPDLOG_INFO("Created logger with level: {}", SPDLOG_ACTIVE_LEVEL);
 }
 
 } // namespace

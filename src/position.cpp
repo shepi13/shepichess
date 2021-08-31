@@ -6,9 +6,8 @@
 #include <sstream>
 #include <utility>
 
-#include <spdlog/spdlog.h>
-
 #include "eval.h"
+#include "logging.h"
 
 namespace shepichess {
 
@@ -45,20 +44,10 @@ std::vector<std::string> split(const std::string& str)
   return results;
 }
 
-int to_int(const std::string& str)
-{
-  try {
-    return stoi(str);
-  } catch (std::invalid_argument) {
-    SPDLOG_ERROR("Failed to parse int from {}", str);
-    return 0;
-  }
-}
-
 std::pair<Piece, bool> getPieceType(char piece_code)
 {
   for (auto&& [piece, code] : kPieceFenCodes) {
-    if (code == piece_code) return std::make_pair(piece, static_cast<int>(piece) > 8);
+    if (code == piece_code) return std::make_pair(piece, static_cast<int>(piece) > 5);
   }
   SPDLOG_ERROR("error: Invalid piece type: {}", piece_code);
   return std::make_pair(Piece::None, false);
@@ -106,10 +95,15 @@ void Position::setPosition(const std::string& fen)
   states.reserve(kMoveStackSize);
   moves.resize(0);
   moves.reserve(kMoveStackSize);
-  // Set Piece Data
-  PositionState current_state {};
+  // Tokenize fen
   auto args = split(fen);
+  if (args.size() < 6) {
+    SPDLOG_CRITICAL("Invalid fen: {}, not all 6 fields present", fen);
+    throw std::runtime_error("Invalid fen");
+  }
+  // Set Piece Data
   int row = 7, col = 7;
+  PositionState current_state {};
   for (auto&& piece_char : args[0]) {
     if (isdigit(piece_char)) {
       col -= piece_char - '0';
@@ -127,8 +121,10 @@ void Position::setPosition(const std::string& fen)
     SPDLOG_DEBUG("Initializing ({},{}) with piece: {}", row, col, piece_char);
     if (piece_type != Piece::None) {
       pieces[row * 8 + col] = piece_type;
-      bitboards::setbit(pieces_by_type[static_cast<int>(piece_type)], row * 8 + col);
-      bitboards::setbit(pieces_by_color[color_idx], row * 8 + col);
+      Bitboard& current_type = pieces_by_type[static_cast<int>(piece_type)];
+      Bitboard& current_color = pieces_by_color[color_idx];
+      current_type = bitboards::setbit(current_type, row * 8 + col);
+      current_color = bitboards::setbit(current_color, row * 8 + col);
       current_state.material[color_idx] += pieceValue(piece_type);
       current_state.zobrist ^=
         kZobristPieces[64 * static_cast<int>(piece_type) + row * 8 + col];
@@ -140,14 +136,13 @@ void Position::setPosition(const std::string& fen)
   current_state.zobrist ^= kZobristSideToMove * static_cast<int>(side_to_move);
   SPDLOG_DEBUG("Initialized side_to_move = {}", args[1]);
   // Set castling rights
-  current_state.white_kingside_castle = args[2].find('K') != std::string::npos;
-  current_state.black_kingside_castle = args[2].find('k') != std::string::npos;
-  current_state.white_queenside_castle = args[2].find('Q') != std::string::npos;
-  current_state.black_queenside_castle = args[2].find('q') != std::string::npos;
-  current_state.zobrist ^= kZobristCastling[0] * current_state.white_kingside_castle;
-  current_state.zobrist ^= kZobristCastling[1] * current_state.white_queenside_castle;
-  current_state.zobrist ^= kZobristCastling[2] * current_state.black_kingside_castle;
-  current_state.zobrist ^= kZobristCastling[3] * current_state.black_queenside_castle;
+  current_state.castling_rights[0] = args[2].find('K') != std::string::npos;
+  current_state.castling_rights[1] = args[2].find('Q') != std::string::npos;
+  current_state.castling_rights[2] = args[2].find('k') != std::string::npos;
+  current_state.castling_rights[3] = args[2].find('q') != std::string::npos;
+  for (int i = 0; i < 4; i++) {
+    current_state.zobrist ^= kZobristCastling[i] * current_state.castling_rights[i];
+  }
   SPDLOG_DEBUG("Initialized castling rights with: {}", args[2]);
   // Set enpassant and move counts
   if (args[3] != "-") {
@@ -155,8 +150,13 @@ void Position::setPosition(const std::string& fen)
     current_state.zobrist ^= kZobristEnpassant[current_state.enpassant_square];
   }
   SPDLOG_DEBUG("Initialized en_passant square: {}", current_state.enpassant_square);
-  current_state.move_count50 = to_int(args[4]);
-  move_number = to_int(args[5]);
+  try {
+    current_state.move_count50 = stoi(args[4]);
+    move_number = stoi(args[5]);
+  } catch (std::invalid_argument) {
+    SPDLOG_CRITICAL("Invalid fen: {}, failed to parse move counts", fen);
+    throw std::runtime_error("Invalid fen");
+  }
   SPDLOG_DEBUG(
     "Initialized move_count50, move_number: {}, {}",
     current_state.move_count50,
@@ -167,7 +167,7 @@ void Position::setPosition(const std::string& fen)
   assert(checkInvariants());
 }
 
-std::string Position::repr()
+std::string Position::repr() const
 {
   std::ostringstream oss;
   for (int row = 7; row >= 0; row--) {
@@ -176,22 +176,71 @@ std::string Position::repr()
     }
     oss << '\n';
   }
-  PositionState& current_state = states.back();
   oss << "Side to move: ";
-  oss << (side_to_move == Color::White ? "white" : "black");
+  oss << (sideToMove() == Color::White ? "white" : "black");
   oss << "\nCastling Rights: ";
-  if (current_state.white_kingside_castle) oss << 'K';
-  if (current_state.white_queenside_castle) oss << 'Q';
-  if (current_state.black_kingside_castle) oss << 'k';
-  if (current_state.black_queenside_castle) oss << 'q';
-  oss << "\nEnpassant file: " << static_cast<char>(current_state.enpassant_square);
-  oss << "\nMoves until draw: " << 100 - current_state.move_count50;
-  oss << "\nMove Number: " << move_number;
-  oss << "\nZobrist: " << current_state.zobrist;
+  if (castlingRights(CastlingType::WhiteKingside)) oss << 'K';
+  if (castlingRights(CastlingType::WhiteQueenside)) oss << 'Q';
+  if (castlingRights(CastlingType::BlackKingside)) oss << 'k';
+  if (castlingRights(CastlingType::BlackQueenside)) oss << 'q';
+  oss << "\nEnpassant file: " << enpassantFile();
+  oss << "\nMoves until draw: " << 100 - moveCount50();
+  oss << "\nMove Number: " << moveNumber();
+  oss << "\nZobrist: " << zobrist();
   return oss.str();
 }
 
-bool Position::checkInvariants()
+Color Position::sideToMove() const
+{
+  return side_to_move;
+}
+
+int Position::moveNumber() const
+{
+  return move_number;
+}
+
+int Position::moveCount50() const
+{
+  return states.back().move_count50;
+}
+
+bool Position::castlingRights(shepichess::CastlingType type) const
+{
+  return states.back().castling_rights[static_cast<int>(type)];
+}
+
+char Position::enpassantFile() const
+{
+  return static_cast<char>(states.back().enpassant_square);
+}
+
+int Position::material(Color color) const
+{
+  return states.back().material[static_cast<int>(color)];
+}
+
+HashKey Position::zobrist() const
+{
+  return states.back().zobrist;
+}
+
+Piece Position::getPiece(int square) const 
+{
+  return pieces[square];
+}
+
+Bitboard Position::colorBitboard(Color color) const
+{
+  return pieces_by_color[static_cast<int>(color)];
+}
+
+Bitboard Position::typeBitboard(Piece piece) const
+{
+  return pieces_by_type[static_cast<int>(piece)];
+}
+
+bool Position::checkInvariants() const
 {
   return true;
 }
