@@ -6,6 +6,7 @@
 
 #include "bitboard.h"
 #include "hash_table.h"
+#include "piece.h"
 #include "move.h"
 
 namespace shepichess {
@@ -14,24 +15,6 @@ void initZobrist();
 
 const std::string kStartPositionFen {
   "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"};
-
-enum class Color { White, Black };
-
-enum class Piece {
-  WhitePawn = 0,
-  WhiteRook,
-  WhiteKnight,
-  WhiteBishop,
-  WhiteQueen,
-  WhiteKing,
-  BlackPawn,
-  BlackRook,
-  BlackKnight,
-  BlackBishop,
-  BlackQueen,
-  BlackKing,
-  None
-};
 
 enum CastlingType { WhiteKingside, WhiteQueenside, BlackKingside, BlackQueenside };
 

@@ -19,20 +19,6 @@ static std::array<HashKey, 4> kZobristCastling;
 static std::array<HashKey, 8> kZobristEnpassant;
 static HashKey kZobristSideToMove;
 
-constexpr std::array<std::pair<Piece, char>, 12> kPieceFenCodes {
-  std::make_pair(Piece::WhiteKing, 'K'),
-  std::make_pair(Piece::BlackKing, 'k'),
-  std::make_pair(Piece::WhiteQueen, 'Q'),
-  std::make_pair(Piece::BlackQueen, 'q'),
-  std::make_pair(Piece::WhiteBishop, 'B'),
-  std::make_pair(Piece::BlackBishop, 'b'),
-  std::make_pair(Piece::WhiteKnight, 'N'),
-  std::make_pair(Piece::BlackKnight, 'n'),
-  std::make_pair(Piece::WhiteRook, 'R'),
-  std::make_pair(Piece::BlackRook, 'r'),
-  std::make_pair(Piece::WhitePawn, 'P'),
-  std::make_pair(Piece::BlackPawn, 'p')};
-
 std::vector<std::string> split(const std::string& str)
 {
   std::istringstream iss {str};
@@ -42,23 +28,6 @@ std::vector<std::string> split(const std::string& str)
     results.push_back(std::move(token));
   }
   return results;
-}
-
-std::pair<Piece, bool> getPieceType(char piece_code)
-{
-  for (auto&& [piece, code] : kPieceFenCodes) {
-    if (code == piece_code) return std::make_pair(piece, static_cast<int>(piece) > 5);
-  }
-  SPDLOG_ERROR("error: Invalid piece type: {}", piece_code);
-  return std::make_pair(Piece::None, false);
-}
-
-char getPieceFenCode(Piece piece_val)
-{
-  for (auto&& [piece, code] : kPieceFenCodes) {
-    if (piece == piece_val) return code;
-  }
-  return '-';
 }
 
 } // namespace
@@ -88,7 +57,7 @@ void Position::setPosition(const std::string& fen)
 {
   SPDLOG_INFO("Initializing position using fen: {}", fen);
   // Reset position data
-  std::fill(pieces.begin(), pieces.end(), Piece::None);
+  std::fill(pieces.begin(), pieces.end(), pieces::None);
   std::fill(pieces_by_type.begin(), pieces_by_type.end(), 0ULL);
   std::fill(pieces_by_color.begin(), pieces_by_color.end(), 0ULL);
   states.resize(0);
@@ -117,17 +86,16 @@ void Position::setPosition(const std::string& fen)
       SPDLOG_CRITICAL("Invalid Row/Column while parsing fen: ({},{})", row, col);
       throw std::logic_error("Invalid row/column while parsing fen");
     }
-    auto [piece_type, color_idx] = getPieceType(piece_char);
+    Piece piece = pieces::getPiece(piece_char);
     SPDLOG_DEBUG("Initializing ({},{}) with piece: {}", row, col, piece_char);
-    if (piece_type != Piece::None) {
-      pieces[row * 8 + col] = piece_type;
-      Bitboard& current_type = pieces_by_type[static_cast<int>(piece_type)];
-      Bitboard& current_color = pieces_by_color[color_idx];
+    if (piece != pieces::None) {
+      pieces[row * 8 + col] = piece;
+      Bitboard& current_type = pieces_by_type[piece.hash()];
+      Bitboard& current_color = pieces_by_color[static_cast<int>(piece.color)];
       current_type = bitboards::setbit(current_type, row * 8 + col);
       current_color = bitboards::setbit(current_color, row * 8 + col);
-      current_state.material[color_idx] += pieceValue(piece_type);
-      current_state.zobrist ^=
-        kZobristPieces[64 * static_cast<int>(piece_type) + row * 8 + col];
+      current_state.material[static_cast<int>(piece.color)] += piece.materialValue;
+      current_state.zobrist ^= kZobristPieces[64 * piece.hash() + row * 8 + col];
     }
     col--;
   }
@@ -172,7 +140,7 @@ std::string Position::repr() const
   std::ostringstream oss;
   for (int row = 7; row >= 0; row--) {
     for (int column = 7; column >= 0; column--) {
-      oss << getPieceFenCode(pieces[row * 8 + column]);
+      oss << pieces[row * 8 + column].fenCode;
     }
     oss << '\n';
   }
@@ -237,7 +205,7 @@ Bitboard Position::colorBitboard(Color color) const
 
 Bitboard Position::typeBitboard(Piece piece) const
 {
-  return pieces_by_type[static_cast<int>(piece)];
+  return pieces_by_type[piece.hash()];
 }
 
 bool Position::checkInvariants() const

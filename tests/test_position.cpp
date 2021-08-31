@@ -68,11 +68,11 @@ TEST_CASE("position::setPosition pieces", "[position, fen]")
   position.setPosition("7K/8/k1P5/7p/8/8/8/8 w - - 0 1");
   REQUIRE(position.checkInvariants());
   std::array<Piece, 64> expected_pieces {};
-  std::fill(expected_pieces.begin(), expected_pieces.end(), Piece::None);
-  expected_pieces[32] = Piece::BlackPawn;
-  expected_pieces[45] = Piece::WhitePawn;
-  expected_pieces[47] = Piece::BlackKing;
-  expected_pieces[56] = Piece::WhiteKing;
+  std::fill(expected_pieces.begin(), expected_pieces.end(), pieces::None);
+  expected_pieces[32] = pieces::BlackPawn;
+  expected_pieces[45] = pieces::WhitePawn;
+  expected_pieces[47] = pieces::BlackKing;
+  expected_pieces[56] = pieces::WhiteKing;
   REQUIRE(position.colorBitboard(Color::White) == 0x01'00'20'00'00'00'00'00);
   REQUIRE(position.colorBitboard(Color::Black) == 0x00'00'80'01'00'00'00'00);
   for (int i = 0; i < 64; i++) {

@@ -13,6 +13,7 @@ set(
     bitboard.h 
     eval.h
     hash_table.h 
+    piece.h
     position.h 
     uci_application.h 
     uci_config.h 

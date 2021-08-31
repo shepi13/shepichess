@@ -4,6 +4,8 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
 
+namespace shepichess {
+
 inline void initLogging()
 {
   auto stderr_logger = spdlog::stderr_color_mt("shepichess_stderr_logger");
@@ -12,3 +14,5 @@ inline void initLogging()
   spdlog::set_pattern("[%Y-%m-%d %H:%M:%S] [thread %t] [%^%l%$] [%s:%#] %v");
   SPDLOG_DEBUG("Created logger with level: {}", SPDLOG_ACTIVE_LEVEL);
 }
+
+} // namespace shepichess
